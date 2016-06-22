@@ -1,8 +1,9 @@
 package in.ac.iitkgp.acaddwh.config;
 
 public class HiveInfo {
-	private static String driverClass = "org.apache.hive.jdbc.HiveDriver";
-	//"org.apache.hadoop.hive.jdbc.HiveDriver";
+	private static String driverClass = 
+			"org.apache.hive.jdbc.HiveDriver";		// For Hive 2
+			//"org.apache.hadoop.hive.jdbc.HiveDriver";	// For Hive 1
 	private static String protocol = "jdbc:hive2:";
 	private static String hostIP = "10.5.30.101";
 	private static long hostPort = 10000;
