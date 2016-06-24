@@ -34,9 +34,10 @@ public class TestHiveLoad {
 					count += testDAO.saveDim(con, test);
 					System.out.println("[C] Consolidated Test " + test);
 				} catch (SQLException e) {
+					e.printStackTrace();
 					logString.append(
 							"Load," + processedLineCount + "," + test.getRoll() + "," + LogFile.getErrorMsg(e) + "\n");
-					con.rollback();
+					//con.rollback();
 				}
 			}
 			if (logString.length() != 0) {
