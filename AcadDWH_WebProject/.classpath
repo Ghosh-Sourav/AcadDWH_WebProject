@@ -11,23 +11,11 @@
 			<attribute name="owner.project.facets" value="jst.web"/>
 		</attributes>
 	</classpathentry>
-	<classpathentry kind="lib" path="WebContent/WEB-INF/lib/postgresql/postgresql-9.4.1208.jar"/>
-	<classpathentry kind="lib" path="WebContent/WEB-INF/lib/hiveserver2/commons-logging-api-1.1.jar"/>
-	<classpathentry kind="lib" path="WebContent/WEB-INF/lib/hiveserver2/hive-common-0.10.0.jar"/>
-	<classpathentry kind="lib" path="WebContent/WEB-INF/lib/hiveserver2/hive-jdbc-0.12.0.jar"/>
-	<classpathentry kind="lib" path="WebContent/WEB-INF/lib/hiveserver2/httpclient-4.3.2.jar"/>
-	<classpathentry kind="lib" path="WebContent/WEB-INF/lib/hiveserver2/httpcore-4.2.5.jar"/>
-	<classpathentry kind="lib" path="WebContent/WEB-INF/lib/hiveserver2/libfb303-0.9.3.jar"/>
-	<classpathentry kind="lib" path="WebContent/WEB-INF/lib/hiveserver2/log4j-1.2.15.jar"/>
-	<classpathentry kind="lib" path="WebContent/WEB-INF/lib/hiveserver2/libthrift-0.9.3.jar"/>
-	<classpathentry kind="lib" path="WebContent/WEB-INF/lib/hiveserver2/slf4j-api-1.7.21.jar"/>
-	<classpathentry kind="lib" path="WebContent/WEB-INF/lib/hiveserver2/slf4j-log4j12-1.7.21.jar"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.8">
 		<attributes>
 			<attribute name="maven.pomderived" value="true"/>
 		</attributes>
 	</classpathentry>
-	<classpathentry kind="lib" path="WebContent/WEB-INF/lib/hiveserver2/hive-service-0.11.0.jar"/>
 	<classpathentry kind="con" path="org.eclipse.m2e.MAVEN2_CLASSPATH_CONTAINER">
 		<attributes>
 			<attribute name="maven.pomderived" value="true"/>

@@ -13,9 +13,9 @@ public class TestDAO {
 		PreparedStatement ps = null;
 
 		try {
-			ps = con.prepareStatement("insert into table test_15cs60r16.test_students select ?, ? from dummy");
-			ps.setString(1, test.getName());
-			ps.setInt(2, test.getRoll());
+			ps = con.prepareStatement("insert into table test_table select ?, ? from dummy");
+			ps.setInt(1, test.getRoll());
+			ps.setString(2, test.getName());
 			
 			System.out.println("Name = "+test.getName()+", Roll = "+test.getRoll());
 

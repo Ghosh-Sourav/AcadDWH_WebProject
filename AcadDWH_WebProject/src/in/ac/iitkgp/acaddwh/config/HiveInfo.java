@@ -7,8 +7,8 @@ public class HiveInfo {
 	private static String protocol = "jdbc:hive2:";
 	private static String hostIP = "10.5.30.101";
 	private static long hostPort = 10000;
-	private static String databaseName = "test_15cs60r16";
-	private static String username = "hive";
+	private static String databaseName = "acaddwh";
+	private static String username = "15CS60R16";
 	private static String password = "";
 
 	private static String url = protocol + "//" + hostIP + ":" + hostPort + "/" + databaseName;
