@@ -5,7 +5,9 @@ public class HiveInfo {
 			"org.apache.hive.jdbc.HiveDriver";		// For Hive 2
 			//"org.apache.hadoop.hive.jdbc.HiveDriver";	// For Hive 1
 	private static String protocol = "jdbc:hive2:";
-	private static String hostIP = "10.5.30.101";
+	private static String hostIP = 
+			"7.224.118.49";		// For authenticated remote access
+			//"10.5.30.101";	// For internal access
 	private static long hostPort = 10000;
 	private static String databaseName = "acaddwh";
 	private static String username = "15CS60R16";
