@@ -1,7 +1,9 @@
 package in.ac.iitkgp.acaddwh.bean.dim;
 
-public class Time {
-	
+import in.ac.iitkgp.acaddwh.bean.Item;
+
+public class Time extends Item {
+
 	private String timeKey;
 	private String timeCode;
 	private String acadsemester;
@@ -37,6 +39,13 @@ public class Time {
 
 	public void setAcadsession(String acadsession) {
 		this.acadsession = acadsession;
+	}
+
+	@Override
+	public String getPrintableLine() {
+		String line;
+		line = timeKey + "," + timeCode + "," + acadsemester + "," + acadsession + ",";
+		return line;
 	}
 
 }

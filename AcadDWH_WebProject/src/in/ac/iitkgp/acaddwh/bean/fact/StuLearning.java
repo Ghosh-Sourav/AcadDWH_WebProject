@@ -1,6 +1,8 @@
 package in.ac.iitkgp.acaddwh.bean.fact;
 
-public class StuLearning {
+import in.ac.iitkgp.acaddwh.bean.Item;
+
+public class StuLearning extends Item {
 
 	private String instituteKey;
 	private String courseKey;
@@ -100,6 +102,14 @@ public class StuLearning {
 
 	public void setPercentAttended(float percentAttended) {
 		this.percentAttended = percentAttended;
+	}
+
+	@Override
+	public String getPrintableLine() {
+		String line;
+		line = instituteKey + "," + courseKey + "," + timeKey + "," + studentKey + "," + regtypeKey + "," + grade + ","
+				+ numGrade + "," + imprFactor + "," + prFnImpr + "," + prPsImpr + "," + percentAttended + "\n";
+		return line;
 	}
 
 }

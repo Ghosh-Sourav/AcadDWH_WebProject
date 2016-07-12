@@ -1,6 +1,8 @@
 package in.ac.iitkgp.acaddwh.bean.dim;
 
-public class EvalArea {
+import in.ac.iitkgp.acaddwh.bean.Item;
+
+public class EvalArea extends Item {
 
 	private String evalAreaKey;
 	private String evalAreaCode;
@@ -28,6 +30,13 @@ public class EvalArea {
 
 	public void setEvalArea(String evalArea) {
 		this.evalArea = evalArea;
+	}
+
+	@Override
+	public String getPrintableLine() {
+		String line;
+		line = evalAreaKey + "," + evalAreaCode + "," + evalArea + "\n";
+		return line;
 	}
 
 }

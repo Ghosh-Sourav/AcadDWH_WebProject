@@ -1,6 +1,8 @@
 package in.ac.iitkgp.acaddwh.bean.dim;
 
-public class Teacher {
+import in.ac.iitkgp.acaddwh.bean.Item;
+
+public class Teacher extends Item {
 
 	private String teacherKey;
 	private String teacherCode;
@@ -37,6 +39,13 @@ public class Teacher {
 
 	public void setTeacherDesg(String teacherDesg) {
 		this.teacherDesg = teacherDesg;
+	}
+
+	@Override
+	public String getPrintableLine() {
+		String line;
+		line = teacherKey + "," + teacherCode + "," + teacherDept + "," + teacherDesg + "\n";
+		return line;
 	}
 
 }

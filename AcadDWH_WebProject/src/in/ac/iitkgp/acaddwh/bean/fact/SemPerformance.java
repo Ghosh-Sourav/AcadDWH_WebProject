@@ -1,6 +1,8 @@
 package in.ac.iitkgp.acaddwh.bean.fact;
 
-public class SemPerformance {
+import in.ac.iitkgp.acaddwh.bean.Item;
+
+public class SemPerformance extends Item {
 
 	private String instituteKey;
 	private String splKey;
@@ -64,6 +66,14 @@ public class SemPerformance {
 
 	public void setCourseFailed(int courseFailed) {
 		this.courseFailed = courseFailed;
+	}
+
+	@Override
+	public String getPrintableLine() {
+		String line;
+		line = instituteKey + "," + splKey + "," + studentKey + "," + cgpa + "," + courseRegistered + ","
+				+ creditRegistered + "," + courseFailed + "\n";
+		return line;
 	}
 
 }

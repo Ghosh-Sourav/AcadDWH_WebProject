@@ -1,6 +1,8 @@
 package in.ac.iitkgp.acaddwh.bean.fact;
 
-public class TeachingQuality {
+import in.ac.iitkgp.acaddwh.bean.Item;
+
+public class TeachingQuality extends Item {
 
 	private String instituteKey;
 	private String courseKey;
@@ -64,6 +66,14 @@ public class TeachingQuality {
 
 	public void setAvgTeachingQuality(float avgTeachingQuality) {
 		this.avgTeachingQuality = avgTeachingQuality;
+	}
+
+	@Override
+	public String getPrintableLine() {
+		String line;
+		line = instituteKey + "," + courseKey + "," + timeKey + "," + teacherKey + "," + evalAreaKey + ","
+				+ noOfEvaluation + "," + avgTeachingQuality + "\n";
+		return line;
 	}
 
 }

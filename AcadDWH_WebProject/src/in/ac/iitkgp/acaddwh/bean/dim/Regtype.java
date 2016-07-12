@@ -1,6 +1,8 @@
 package in.ac.iitkgp.acaddwh.bean.dim;
 
-public class Regtype {
+import in.ac.iitkgp.acaddwh.bean.Item;
+
+public class Regtype extends Item {
 
 	private String regtypeKey;
 	private String regtypeCode;
@@ -28,6 +30,13 @@ public class Regtype {
 
 	public void setRegtypeDesc(String regtypeDesc) {
 		this.regtypeDesc = regtypeDesc;
+	}
+
+	@Override
+	public String getPrintableLine() {
+		String line;
+		line = regtypeKey + "," + regtypeCode + "," + regtypeDesc + "\n";
+		return line;
 	}
 
 }

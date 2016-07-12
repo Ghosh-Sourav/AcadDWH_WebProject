@@ -1,6 +1,8 @@
 package in.ac.iitkgp.acaddwh.bean.fact;
 
-public class SplPerformance {
+import in.ac.iitkgp.acaddwh.bean.Item;
+
+public class SplPerformance extends Item {
 
 	private String instituteKey;
 	private String splKey;
@@ -82,6 +84,14 @@ public class SplPerformance {
 
 	public void setAvgSalary(float avgSalary) {
 		this.avgSalary = avgSalary;
+	}
+
+	@Override
+	public String getPrintableLine() {
+		String line;
+		line = instituteKey + "," + splKey + "," + timeKey + "," + admStuCnt + "," + onrollStuCnt + "," + gradStuCnt
+				+ "," + dropoutStuCnt + "," + percentPlaced + "," + avgSalary + "\n";
+		return line;
 	}
 
 }

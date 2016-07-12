@@ -1,6 +1,8 @@
 package in.ac.iitkgp.acaddwh.bean.dim;
 
-public class Request {
+import in.ac.iitkgp.acaddwh.bean.Item;
+
+public class Request extends Item {
 	private String requestKey;
 	private String instituteKey;
 	private String fileNameWithoutExtn;
@@ -36,6 +38,13 @@ public class Request {
 
 	public void setStatus(String status) {
 		this.status = status;
+	}
+
+	@Override
+	public String getPrintableLine() {
+		String line;
+		line = requestKey + "," + instituteKey + "," + fileNameWithoutExtn + "," + status + "\n";
+		return line;
 	}
 
 }

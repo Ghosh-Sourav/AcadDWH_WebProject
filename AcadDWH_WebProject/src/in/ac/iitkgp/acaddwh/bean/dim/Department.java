@@ -1,6 +1,8 @@
 package in.ac.iitkgp.acaddwh.bean.dim;
 
-public class Department {
+import in.ac.iitkgp.acaddwh.bean.Item;
+
+public class Department extends Item {
 
 	private String deptKey;
 	private String deptCode;
@@ -37,6 +39,13 @@ public class Department {
 
 	public void setDeptDcsType(String deptDcsType) {
 		this.deptDcsType = deptDcsType;
+	}
+
+	@Override
+	public String getPrintableLine() {
+		String line;
+		line = deptKey + "," + deptCode + "," + deptName + "," + deptDcsType + "\n";
+		return line;
 	}
 
 }

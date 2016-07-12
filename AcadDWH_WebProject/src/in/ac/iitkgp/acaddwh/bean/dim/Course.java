@@ -1,6 +1,8 @@
 package in.ac.iitkgp.acaddwh.bean.dim;
 
-public class Course {
+import in.ac.iitkgp.acaddwh.bean.Item;
+
+public class Course extends Item {
 
 	private String courseKey;
 	private String courseCode;
@@ -91,6 +93,15 @@ public class Course {
 
 	public void setCourseLevel(String courseLevel) {
 		this.courseLevel = courseLevel;
+	}
+
+	@Override
+	public String getPrintableLine() {
+		String line;
+		line = courseKey + "," + courseCode + "," + courseName + "," + courseType + "," + courseDept + "," + courseCrd
+				+ "," + courseLectureHour + "," + courseTutorialHour + "," + coursePracticalHour + "," + courseLevel
+				+ "\n";
+		return line;
 	}
 
 }

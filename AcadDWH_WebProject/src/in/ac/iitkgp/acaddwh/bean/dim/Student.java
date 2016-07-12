@@ -1,6 +1,8 @@
 package in.ac.iitkgp.acaddwh.bean.dim;
 
-public class Student {
+import in.ac.iitkgp.acaddwh.bean.Item;
+
+public class Student extends Item {
 	private String studentKey;
 	private String studentCode;
 	private String splKey;
@@ -60,6 +62,14 @@ public class Student {
 	public String toString() {
 		return "<Key = " + studentKey + ", Value = {" + studentCode + "," + splKey + "," + studentNoa + ","
 				+ studentGender + "," + admissionYear + "}";
+	}
+
+	@Override
+	public String getPrintableLine() {
+		String line;
+		line = studentKey + "," + studentCode + "," + splKey + "," + studentNoa + "," + studentGender + ","
+				+ admissionYear + "\n";
+		return line;
 	}
 
 }
