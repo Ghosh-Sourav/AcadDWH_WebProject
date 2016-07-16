@@ -12,7 +12,7 @@ public class EvalAreaDAO {
 		PreparedStatement ps = null;
 
 		try {
-			ps = con.prepareStatement("insert into acaddwh.dim_eval_areas values (?,?,?,?)");
+			ps = con.prepareStatement("insert into acaddwh.dim_eval_areas values (?,?,?)");
 			ps.setString(1, evalArea.getEvalAreaKey());
 			ps.setString(2, evalArea.getEvalAreaCode());
 			ps.setString(3, evalArea.getEvalArea());

@@ -41,6 +41,7 @@ public class LogFile {
 			errorMsg = "Key value is already present";
 		} else {
 			errorMsg = "Data is invalid";
+			System.out.println(e.getMessage());
 		}
 		
 		return errorMsg;
