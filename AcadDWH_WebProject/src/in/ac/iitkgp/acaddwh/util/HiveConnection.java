@@ -12,26 +12,25 @@ public class HiveConnection {
 		Connection con = null;
 		try {
 			Class.forName(HiveInfo.getDriverClass());
-			DriverManager.setLoginTimeout(10);
+			//DriverManager.setLoginTimeout(10);
 			con = DriverManager.getConnection(HiveInfo.getUrl(), HiveInfo.getUsername(), HiveInfo.getPassword());
 		} catch (ClassNotFoundException e) {
 			e.printStackTrace();
-			throw(e);
+			throw (e);
 		} catch (SQLException e) {
 			e.printStackTrace();
-			throw(e);
+			throw (e);
 		}
 		return con;
 	}
-	
+
 	public static void closeConnection(Connection con) {
 		if (con != null) {
 			try {
 				con.close();
 			} catch (SQLException e) {
-				e.printStackTrace();
+				System.out.println("Hive connection still running; will be cleaned when done!");
 			}
-
 		}
 	}
 

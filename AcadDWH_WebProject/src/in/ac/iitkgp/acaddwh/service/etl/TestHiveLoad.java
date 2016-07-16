@@ -8,46 +8,49 @@ import java.util.List;
 import in.ac.iitkgp.acaddwh.bean.Test;
 import in.ac.iitkgp.acaddwh.config.HiveInfo;
 import in.ac.iitkgp.acaddwh.dao.TestDAO;
-import in.ac.iitkgp.acaddwh.exception.LoadException;
+import in.ac.iitkgp.acaddwh.exception.HiveException;
 import in.ac.iitkgp.acaddwh.util.HiveConnection;
 import in.ac.iitkgp.acaddwh.util.LogFile;
 
 public class TestHiveLoad {
 
 	@SuppressWarnings("unchecked")
-	public int load(List<?> tests, String absoluteLogFileName) throws LoadException {
+	public int load(List<?> tests, String absoluteLogFileName) throws HiveException {
 		int count = 0, processedLineCount = 0;
 		StringBuffer logString = new StringBuffer();
 
 		Connection con = null;
-		
+
 		TestDAO testDAO = new TestDAO();
 
 		try {
-			
+
 			con = HiveConnection.getSaveConnection();
 			System.out.println("Connection obtained!");
-			
+
+			testDAO.printItems(con);
+
 			for (Test test : (List<Test>) tests) {
 				try {
 					++processedLineCount;
 					count += testDAO.saveDim(con, test);
-					System.out.println("[C] Consolidated Test " + test);
+					System.out.println("[W] Warehoused Test " + test);
 				} catch (SQLException e) {
-					e.printStackTrace();
-					logString.append(
-							"Load," + processedLineCount + "," + test.getRoll() + "," + LogFile.getErrorMsg(e) + "\n");
-					//con.rollback();
+					logString.append("Warehouse," + processedLineCount + "," + test.getRoll() + ","
+							+ LogFile.getErrorMsg(e) + ": " + e.getMessage() + "\n");
 				}
 			}
 			if (logString.length() != 0) {
-				throw (new LoadException());
+				throw (new HiveException());
 			}
-			System.out.println("Committing updates...");
+			System.out.println("Submitted for warehousing!");
 		} catch (Exception e) {
-			e.printStackTrace();
+			System.out.println("Warehousing failed!");
 			System.out.println(logString);
-			// TODO: Throw save exception here
+			System.out.println("garbage at "+absoluteLogFileName);
+			//LogFile.writeToLogFile(absoluteLogFileName, logString);
+			count = 0;
+			throw (new HiveException());
 		} finally {
 			HiveConnection.closeConnection(con);
 		}
@@ -59,8 +62,8 @@ public class TestHiveLoad {
 		List<Test> tests = new ArrayList<Test>();
 
 		Test test = new Test();
-		test.setName("Inserted User");
-		test.setRoll(120);
+		test.setName("Sourav Ghosh 1234");
+		test.setRoll(16);
 
 		tests.add(test);
 
@@ -70,7 +73,7 @@ public class TestHiveLoad {
 			System.out.println(HiveInfo.getUrl());
 			testHiveLoad.load(tests, "");
 			System.out.println("Finished with success!");
-		} catch (LoadException e) {
+		} catch (HiveException e) {
 			e.printStackTrace();
 		}
 		System.out.println();

@@ -1,5 +1,7 @@
 package in.ac.iitkgp.acaddwh.dao;
 
+import java.io.File;
+import java.net.MalformedURLException;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -8,17 +10,19 @@ import java.sql.SQLException;
 import in.ac.iitkgp.acaddwh.bean.Test;
 
 public class TestDAO {
-	public int saveDim(Connection con, Test test) throws SQLException {
+	public synchronized int saveDim(Connection con, Test test) throws SQLException {
 		int returnValue = 0;
 		PreparedStatement ps = null;
 
 		try {
-			//ps = con.prepareStatement("insert into table test_table select ?, ? from dummy");
-			//ps.setInt(1, test.getRoll());
-			//ps.setString(2, test.getName());
+//			ps = con.prepareStatement("insert into table test_table select ?, ? from dummy");
+//			ps.setInt(1, test.getRoll());
+//			ps.setString(2, test.getName());
 			
-			ps = con.prepareStatement("LOAD DATA INPATH ? INTO TABLE acaddwh.test_table");
-			ps.setString(1, "/user/mtech/15CS60R16/test_table_data.csv");
+			ps = con.prepareStatement("LOAD DATA LOCAL INPATH ? INTO TABLE acaddwh.test_table");
+			String filePath = "G:/acaddwh/test_table_data.csv";
+			ps.setString(1, "file:///"+filePath);
+			System.out.println("file:///"+filePath);
 
 			System.out.println("Name = " + test.getName() + ", Roll = " + test.getRoll());
 			
@@ -37,7 +41,7 @@ public class TestDAO {
 		PreparedStatement ps = null;
 
 		try {
-			ps = con.prepareStatement("select * from acaddwh.test_table");
+			ps = con.prepareStatement("select * from acaddwh.test_table where roll<20");
 
 			rs = ps.executeQuery();
 			while (rs.next()) {
