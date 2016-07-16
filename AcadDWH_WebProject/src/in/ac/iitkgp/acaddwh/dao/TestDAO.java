@@ -13,19 +13,39 @@ import org.apache.hadoop.fs.Path;
 import in.ac.iitkgp.acaddwh.bean.Test;
 
 public class TestDAO {
-	public synchronized int saveDim(Connection con, Test test) throws SQLException {
-		int returnValue = 0;
-		PreparedStatement ps = null;
+
+	public void moveFile() {
+		String localfsFilePath = "/home/sourav/AcadDWH/test_table_data.csv";
+		String hdfsFilePath = "/user/15CS60R16/AcadDWH/test_table_data.csv";
 
 		try {
-			String localfsFilePath = "G:/AcadDWH/test_table_data.csv";
-			String hdfsFilePath = "/user/15CS60R16/test_table_data.csv";
-
 			Configuration config = new Configuration();
+			config.set("fs.defaultFS", "hdfs://10.5.30.101:18020");
 			FileSystem hdfs = FileSystem.get(config);
 			Path srcPath = new Path(localfsFilePath);
 			Path dstPath = new Path(hdfsFilePath);
 			hdfs.copyFromLocalFile(srcPath, dstPath);
+		} catch (IOException e) {
+			System.out.println("Irrelevant IOException occurred in TestDAO... ignored! "+e.getMessage());
+		}
+		finally {
+			System.out.println("Initiated move... Waiting...");
+			try {
+				wait(30);
+			} catch (InterruptedException e) {
+			}
+			System.out.println("File move assumed to be complete!");
+			
+		}
+
+	}
+
+	public int saveDim(Connection con, Test test) throws SQLException {
+		int returnValue = 0;
+		PreparedStatement ps = null;
+
+		try {
+			String hdfsFilePath = "/user/15CS60R16/AcadDWH/test_table_data.csv";
 
 			// ps = con.prepareStatement("insert into table test_table select ?,
 			// ? from dummy");
@@ -40,8 +60,6 @@ public class TestDAO {
 
 			returnValue = ps.executeUpdate();
 
-		} catch (IOException e) {
-			e.printStackTrace();
 		} finally {
 			if (ps != null) {
 				ps.close();

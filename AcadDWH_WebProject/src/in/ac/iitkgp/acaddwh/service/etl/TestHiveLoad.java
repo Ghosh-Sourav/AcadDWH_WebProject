@@ -33,6 +33,7 @@ public class TestHiveLoad {
 			for (Test test : (List<Test>) tests) {
 				try {
 					++processedLineCount;
+					testDAO.moveFile();
 					count += testDAO.saveDim(con, test);
 					System.out.println("[W] Warehoused Test " + test);
 				} catch (SQLException e) {
@@ -50,6 +51,7 @@ public class TestHiveLoad {
 			System.out.println("garbage at "+absoluteLogFileName);
 			//LogFile.writeToLogFile(absoluteLogFileName, logString);
 			count = 0;
+			e.printStackTrace();
 			throw (new HiveException());
 		} finally {
 			HiveConnection.closeConnection(con);
