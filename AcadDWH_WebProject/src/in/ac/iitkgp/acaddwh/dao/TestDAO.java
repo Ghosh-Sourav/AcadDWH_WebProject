@@ -1,7 +1,5 @@
 package in.ac.iitkgp.acaddwh.dao;
 
-import java.io.File;
-import java.net.MalformedURLException;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
