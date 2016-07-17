@@ -3,6 +3,7 @@ package in.ac.iitkgp.acaddwh.util;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
+import java.util.concurrent.Executors;
 
 import in.ac.iitkgp.acaddwh.config.HiveInfo;
 
@@ -14,6 +15,10 @@ public class HiveConnection {
 			Class.forName(HiveInfo.getDriverClass());
 			//DriverManager.setLoginTimeout(10);
 			con = DriverManager.getConnection(HiveInfo.getUrl(), HiveInfo.getUsername(), HiveInfo.getPassword());
+			
+			/* To come out of blocking during query executions */
+			con.setNetworkTimeout(Executors.newCachedThreadPool(), 100);
+			
 		} catch (ClassNotFoundException e) {
 			e.printStackTrace();
 		} catch (SQLException e) {
