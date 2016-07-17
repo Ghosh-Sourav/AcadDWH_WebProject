@@ -13,8 +13,10 @@ import in.ac.iitkgp.acaddwh.dao.dim.EvalAreaDAO;
 import in.ac.iitkgp.acaddwh.exception.ExtractException;
 import in.ac.iitkgp.acaddwh.exception.LoadException;
 import in.ac.iitkgp.acaddwh.exception.TransformException;
+import in.ac.iitkgp.acaddwh.exception.WarehouseException;
 import in.ac.iitkgp.acaddwh.service.ETLService;
 import in.ac.iitkgp.acaddwh.util.DBConnection;
+import in.ac.iitkgp.acaddwh.util.HiveConnection;
 import in.ac.iitkgp.acaddwh.util.LogFile;
 
 public class EvalAreaETL implements ETLService<EvalArea> {
@@ -40,7 +42,8 @@ public class EvalAreaETL implements ETLService<EvalArea> {
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
-			logString.append("Extract," + evalAreas.size() + ",Not Extracted,Data format is invalid - Further lines ignored\n");
+			logString.append(
+					"Extract," + evalAreas.size() + ",Not Extracted,Data format is invalid - Further lines ignored\n");
 			LogFile.writeToLogFile(absoluteLogFileName, logString);
 			throw (new ExtractException());
 		} finally {
@@ -85,7 +88,7 @@ public class EvalAreaETL implements ETLService<EvalArea> {
 			for (EvalArea evalArea : (List<EvalArea>) evalAreas) {
 				try {
 					++processedLineCount;
-					count += evalAreaDAO.addDim(con, evalArea);
+					count += evalAreaDAO.addToDB(con, evalArea);
 					System.out.println("[UC] Loaded EvalArea " + evalArea);
 				} catch (SQLException e) {
 					logString.append("Load," + processedLineCount + "," + evalArea.getEvalAreaCode() + ","
@@ -110,6 +113,41 @@ public class EvalAreaETL implements ETLService<EvalArea> {
 			}
 		} finally {
 			DBConnection.closeConnection(con);
+		}
+
+		return count;
+	}
+
+	@SuppressWarnings("unchecked")
+	public int warehouse(List<?> evalAreas, String absoluteLogFileName) throws WarehouseException {
+		int count = 0, processedLineCount = 0;
+		StringBuffer logString = new StringBuffer();
+
+		Connection con = HiveConnection.getSaveConnection();
+		EvalAreaDAO evalAreaDAO = new EvalAreaDAO();
+
+		try {
+			for (EvalArea evalArea : (List<EvalArea>) evalAreas) {
+				try {
+					++processedLineCount;
+					count += evalAreaDAO.addToHive(con, evalArea);
+					System.out.println("[W] Warehoused EvalArea " + evalArea);
+				} catch (SQLException e) {
+					logString.append("Warehouse," + processedLineCount + "," + evalArea.getEvalAreaCode() + ","
+							+ LogFile.getErrorMsg(e) + "\n");
+				}
+			}
+			if (logString.length() != 0) {
+				throw (new WarehouseException());
+			}
+			System.out.println("Warehoused data!");
+		} catch (Exception e) {
+			System.out.println("WarehouseException thrown!");
+			LogFile.writeToLogFile(absoluteLogFileName, logString);
+			count = 0;
+			throw (new WarehouseException());
+		} finally {
+			HiveConnection.closeConnection(con);
 		}
 
 		return count;

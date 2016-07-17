@@ -13,8 +13,10 @@ import in.ac.iitkgp.acaddwh.dao.fact.TeachingQualityDAO;
 import in.ac.iitkgp.acaddwh.exception.ExtractException;
 import in.ac.iitkgp.acaddwh.exception.LoadException;
 import in.ac.iitkgp.acaddwh.exception.TransformException;
+import in.ac.iitkgp.acaddwh.exception.WarehouseException;
 import in.ac.iitkgp.acaddwh.service.ETLService;
 import in.ac.iitkgp.acaddwh.util.DBConnection;
+import in.ac.iitkgp.acaddwh.util.HiveConnection;
 import in.ac.iitkgp.acaddwh.util.LogFile;
 
 public class TeachingQualityETL implements ETLService<TeachingQuality> {
@@ -93,15 +95,15 @@ public class TeachingQualityETL implements ETLService<TeachingQuality> {
 			for (TeachingQuality teachingQuality : (List<TeachingQuality>) teachingQualitys) {
 				try {
 					++processedLineCount;
-					count += teachingQualityDAO.addFact(con, teachingQuality);
+					count += teachingQualityDAO.addToDB(con, teachingQuality);
 					System.out.println("[UC] Loaded TeachingQuality " + teachingQuality);
 				} catch (SQLException e) {
 					logString.append("Load," + processedLineCount + ","
 							+ teachingQuality.getCourseKey().replace(teachingQuality.getInstituteKey() + "_", "") + ";"
 							+ teachingQuality.getTimeKey().replace(teachingQuality.getInstituteKey() + "_", "") + ";"
 							+ teachingQuality.getTeacherKey().replace(teachingQuality.getInstituteKey() + "_", "") + ";"
-							+ teachingQuality.getEvalAreaKey().replace(teachingQuality.getInstituteKey() + "_", "") + ","
-							+ LogFile.getErrorMsg(e) + "\n");
+							+ teachingQuality.getEvalAreaKey().replace(teachingQuality.getInstituteKey() + "_", "")
+							+ "," + LogFile.getErrorMsg(e) + "\n");
 					con.rollback();
 				}
 			}
@@ -122,6 +124,45 @@ public class TeachingQualityETL implements ETLService<TeachingQuality> {
 			}
 		} finally {
 			DBConnection.closeConnection(con);
+		}
+
+		return count;
+	}
+
+	@SuppressWarnings("unchecked")
+	public int warehouse(List<?> teachingQualitys, String absoluteLogFileName) throws WarehouseException {
+		int count = 0, processedLineCount = 0;
+		StringBuffer logString = new StringBuffer();
+
+		Connection con = HiveConnection.getSaveConnection();
+		TeachingQualityDAO teachingQualityDAO = new TeachingQualityDAO();
+
+		try {
+			for (TeachingQuality teachingQuality : (List<TeachingQuality>) teachingQualitys) {
+				try {
+					++processedLineCount;
+					count += teachingQualityDAO.addToHive(con, teachingQuality);
+					System.out.println("[W] Warehoused TeachingQuality " + teachingQuality);
+				} catch (SQLException e) {
+					logString.append("Warehouse," + processedLineCount + ","
+							+ teachingQuality.getCourseKey().replace(teachingQuality.getInstituteKey() + "_", "") + ";"
+							+ teachingQuality.getTimeKey().replace(teachingQuality.getInstituteKey() + "_", "") + ";"
+							+ teachingQuality.getTeacherKey().replace(teachingQuality.getInstituteKey() + "_", "") + ";"
+							+ teachingQuality.getEvalAreaKey().replace(teachingQuality.getInstituteKey() + "_", "")
+							+ "," + LogFile.getErrorMsg(e) + "\n");
+				}
+			}
+			if (logString.length() != 0) {
+				throw (new WarehouseException());
+			}
+			System.out.println("Warehoused data!");
+		} catch (Exception e) {
+			System.out.println("WarehouseException thrown!");
+			LogFile.writeToLogFile(absoluteLogFileName, logString);
+			count = 0;
+			throw (new WarehouseException());
+		} finally {
+			HiveConnection.closeConnection(con);
 		}
 
 		return count;

@@ -13,8 +13,10 @@ import in.ac.iitkgp.acaddwh.dao.fact.SemPerformanceDAO;
 import in.ac.iitkgp.acaddwh.exception.ExtractException;
 import in.ac.iitkgp.acaddwh.exception.LoadException;
 import in.ac.iitkgp.acaddwh.exception.TransformException;
+import in.ac.iitkgp.acaddwh.exception.WarehouseException;
 import in.ac.iitkgp.acaddwh.service.ETLService;
 import in.ac.iitkgp.acaddwh.util.DBConnection;
+import in.ac.iitkgp.acaddwh.util.HiveConnection;
 import in.ac.iitkgp.acaddwh.util.LogFile;
 
 public class SemPerformanceETL implements ETLService<SemPerformance> {
@@ -91,7 +93,7 @@ public class SemPerformanceETL implements ETLService<SemPerformance> {
 			for (SemPerformance semPerformance : (List<SemPerformance>) semPerformances) {
 				try {
 					++processedLineCount;
-					count += semPerformanceDAO.addFact(con, semPerformance);
+					count += semPerformanceDAO.addToDB(con, semPerformance);
 					System.out.println("[UC] Loaded SemPerformance " + semPerformance);
 				} catch (SQLException e) {
 					logString.append("Load," + processedLineCount + ","
@@ -118,6 +120,43 @@ public class SemPerformanceETL implements ETLService<SemPerformance> {
 			}
 		} finally {
 			DBConnection.closeConnection(con);
+		}
+
+		return count;
+	}
+
+	@SuppressWarnings("unchecked")
+	public int warehouse(List<?> semPerformances, String absoluteLogFileName) throws WarehouseException {
+		int count = 0, processedLineCount = 0;
+		StringBuffer logString = new StringBuffer();
+
+		Connection con = HiveConnection.getSaveConnection();
+		SemPerformanceDAO semPerformanceDAO = new SemPerformanceDAO();
+
+		try {
+			for (SemPerformance semPerformance : (List<SemPerformance>) semPerformances) {
+				try {
+					++processedLineCount;
+					count += semPerformanceDAO.addToHive(con, semPerformance);
+					System.out.println("[W] Warehoused SemPerformance " + semPerformance);
+				} catch (SQLException e) {
+					logString.append("Warehouse," + processedLineCount + ","
+							+ semPerformance.getSplKey().replace(semPerformance.getInstituteKey() + "_", "") + ";"
+							+ semPerformance.getStudentKey().replace(semPerformance.getInstituteKey() + "_", "") + ","
+							+ LogFile.getErrorMsg(e) + "\n");
+				}
+			}
+			if (logString.length() != 0) {
+				throw (new WarehouseException());
+			}
+			System.out.println("Warehoused data!");
+		} catch (Exception e) {
+			System.out.println("WarehouseException thrown!");
+			LogFile.writeToLogFile(absoluteLogFileName, logString);
+			count = 0;
+			throw (new WarehouseException());
+		} finally {
+			HiveConnection.closeConnection(con);
 		}
 
 		return count;

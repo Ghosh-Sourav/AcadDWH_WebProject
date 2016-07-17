@@ -13,8 +13,10 @@ import in.ac.iitkgp.acaddwh.dao.dim.DepartmentDAO;
 import in.ac.iitkgp.acaddwh.exception.ExtractException;
 import in.ac.iitkgp.acaddwh.exception.LoadException;
 import in.ac.iitkgp.acaddwh.exception.TransformException;
+import in.ac.iitkgp.acaddwh.exception.WarehouseException;
 import in.ac.iitkgp.acaddwh.service.ETLService;
 import in.ac.iitkgp.acaddwh.util.DBConnection;
+import in.ac.iitkgp.acaddwh.util.HiveConnection;
 import in.ac.iitkgp.acaddwh.util.LogFile;
 
 public class DepartmentETL implements ETLService<Department> {
@@ -41,7 +43,8 @@ public class DepartmentETL implements ETLService<Department> {
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
-			logString.append("Extract," + departments.size() + ",Not Extracted,Data format is invalid - Further lines ignored\n");
+			logString.append("Extract," + departments.size()
+					+ ",Not Extracted,Data format is invalid - Further lines ignored\n");
 			LogFile.writeToLogFile(absoluteLogFileName, logString);
 			throw (new ExtractException());
 		} finally {
@@ -85,7 +88,7 @@ public class DepartmentETL implements ETLService<Department> {
 			for (Department department : (List<Department>) departments) {
 				try {
 					++processedLineCount;
-					count += departmentDAO.addDim(con, department);
+					count += departmentDAO.addToDB(con, department);
 					System.out.println("[UC] Loaded Department " + department);
 				} catch (SQLException e) {
 					logString.append("Load," + processedLineCount + "," + department.getDeptCode() + ","
@@ -110,6 +113,41 @@ public class DepartmentETL implements ETLService<Department> {
 			}
 		} finally {
 			DBConnection.closeConnection(con);
+		}
+
+		return count;
+	}
+
+	@SuppressWarnings("unchecked")
+	public int warehouse(List<?> departments, String absoluteLogFileName) throws WarehouseException {
+		int count = 0, processedLineCount = 0;
+		StringBuffer logString = new StringBuffer();
+
+		Connection con = HiveConnection.getSaveConnection();
+		DepartmentDAO departmentDAO = new DepartmentDAO();
+
+		try {
+			for (Department department : (List<Department>) departments) {
+				try {
+					++processedLineCount;
+					count += departmentDAO.addToHive(con, department);
+					System.out.println("[W] Warehoused Department " + department);
+				} catch (SQLException e) {
+					logString.append("Warehouse," + processedLineCount + "," + department.getDeptCode() + ","
+							+ LogFile.getErrorMsg(e) + "\n");
+				}
+			}
+			if (logString.length() != 0) {
+				throw (new WarehouseException());
+			}
+			System.out.println("Warehoused data!");
+		} catch (Exception e) {
+			System.out.println("WarehouseException thrown!");
+			LogFile.writeToLogFile(absoluteLogFileName, logString);
+			count = 0;
+			throw (new WarehouseException());
+		} finally {
+			HiveConnection.closeConnection(con);
 		}
 
 		return count;

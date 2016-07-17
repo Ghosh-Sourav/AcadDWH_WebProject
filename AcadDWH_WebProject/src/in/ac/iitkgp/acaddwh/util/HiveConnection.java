@@ -8,7 +8,7 @@ import in.ac.iitkgp.acaddwh.config.HiveInfo;
 
 public class HiveConnection {
 
-	public static Connection getSaveConnection() throws ClassNotFoundException, SQLException {
+	public static Connection getSaveConnection() {
 		Connection con = null;
 		try {
 			Class.forName(HiveInfo.getDriverClass());
@@ -16,10 +16,8 @@ public class HiveConnection {
 			con = DriverManager.getConnection(HiveInfo.getUrl(), HiveInfo.getUsername(), HiveInfo.getPassword());
 		} catch (ClassNotFoundException e) {
 			e.printStackTrace();
-			throw (e);
 		} catch (SQLException e) {
 			e.printStackTrace();
-			throw (e);
 		}
 		return con;
 	}

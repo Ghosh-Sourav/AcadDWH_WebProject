@@ -13,9 +13,11 @@ import in.ac.iitkgp.acaddwh.dao.dim.InstituteDAO;
 import in.ac.iitkgp.acaddwh.exception.ExtractException;
 import in.ac.iitkgp.acaddwh.exception.LoadException;
 import in.ac.iitkgp.acaddwh.exception.TransformException;
+import in.ac.iitkgp.acaddwh.exception.WarehouseException;
 import in.ac.iitkgp.acaddwh.service.ETLService;
 import in.ac.iitkgp.acaddwh.util.Cryptography;
 import in.ac.iitkgp.acaddwh.util.DBConnection;
+import in.ac.iitkgp.acaddwh.util.HiveConnection;
 import in.ac.iitkgp.acaddwh.util.LogFile;
 
 public class InstituteETL implements ETLService<Institute> {
@@ -41,7 +43,8 @@ public class InstituteETL implements ETLService<Institute> {
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
-			logString.append("Extract," + institutes.size() + ",Not Extracted,Data format is invalid - Further lines ignored\n");
+			logString.append(
+					"Extract," + institutes.size() + ",Not Extracted,Data format is invalid - Further lines ignored\n");
 			LogFile.writeToLogFile(absoluteLogFileName, logString);
 			throw (new ExtractException());
 		} finally {
@@ -87,7 +90,7 @@ public class InstituteETL implements ETLService<Institute> {
 			for (Institute institute : (List<Institute>) institutes) {
 				try {
 					++processedLineCount;
-					count += instituteDAO.addDim(con, institute);
+					count += instituteDAO.addToDB(con, institute);
 					System.out.println("[UC] Loaded Institute " + institute);
 				} catch (SQLException e) {
 					logString.append("Load," + processedLineCount + "," + institute.getInstituteKey() + ","
@@ -112,6 +115,41 @@ public class InstituteETL implements ETLService<Institute> {
 			}
 		} finally {
 			DBConnection.closeConnection(con);
+		}
+
+		return count;
+	}
+
+	@SuppressWarnings("unchecked")
+	public int warehouse(List<?> institutes, String absoluteLogFileName) throws WarehouseException {
+		int count = 0, processedLineCount = 0;
+		StringBuffer logString = new StringBuffer();
+
+		Connection con = HiveConnection.getSaveConnection();
+		InstituteDAO instituteDAO = new InstituteDAO();
+
+		try {
+			for (Institute institute : (List<Institute>) institutes) {
+				try {
+					++processedLineCount;
+					count += instituteDAO.addToHive(con, institute);
+					System.out.println("[W] Warehoused Institute " + institute);
+				} catch (SQLException e) {
+					logString.append("Warehouse," + processedLineCount + "," + institute.getInstituteKey() + ","
+							+ LogFile.getErrorMsg(e) + "\n");
+				}
+			}
+			if (logString.length() != 0) {
+				throw (new WarehouseException());
+			}
+			System.out.println("Warehoused data!");
+		} catch (Exception e) {
+			System.out.println("WarehouseException thrown!");
+			LogFile.writeToLogFile(absoluteLogFileName, logString);
+			count = 0;
+			throw (new WarehouseException());
+		} finally {
+			HiveConnection.closeConnection(con);
 		}
 
 		return count;

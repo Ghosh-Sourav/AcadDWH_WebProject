@@ -13,8 +13,10 @@ import in.ac.iitkgp.acaddwh.dao.dim.TimeDAO;
 import in.ac.iitkgp.acaddwh.exception.ExtractException;
 import in.ac.iitkgp.acaddwh.exception.LoadException;
 import in.ac.iitkgp.acaddwh.exception.TransformException;
+import in.ac.iitkgp.acaddwh.exception.WarehouseException;
 import in.ac.iitkgp.acaddwh.service.ETLService;
 import in.ac.iitkgp.acaddwh.util.DBConnection;
+import in.ac.iitkgp.acaddwh.util.HiveConnection;
 import in.ac.iitkgp.acaddwh.util.LogFile;
 
 public class TimeETL implements ETLService<Time> {
@@ -41,7 +43,8 @@ public class TimeETL implements ETLService<Time> {
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
-			logString.append("Extract," + times.size() + ",Not Extracted,Data format is invalid - Further lines ignored\n");
+			logString.append(
+					"Extract," + times.size() + ",Not Extracted,Data format is invalid - Further lines ignored\n");
 			LogFile.writeToLogFile(absoluteLogFileName, logString);
 			throw (new ExtractException());
 		} finally {
@@ -85,7 +88,7 @@ public class TimeETL implements ETLService<Time> {
 			for (Time time : (List<Time>) times) {
 				try {
 					++processedLineCount;
-					count += timeDAO.addDim(con, time);
+					count += timeDAO.addToDB(con, time);
 					System.out.println("[UC] Loaded Time " + time);
 				} catch (SQLException e) {
 					logString.append("Load," + processedLineCount + "," + time.getTimeCode() + ","
@@ -110,6 +113,41 @@ public class TimeETL implements ETLService<Time> {
 			}
 		} finally {
 			DBConnection.closeConnection(con);
+		}
+
+		return count;
+	}
+
+	@SuppressWarnings("unchecked")
+	public int warehouse(List<?> times, String absoluteLogFileName) throws WarehouseException {
+		int count = 0, processedLineCount = 0;
+		StringBuffer logString = new StringBuffer();
+
+		Connection con = HiveConnection.getSaveConnection();
+		TimeDAO timeDAO = new TimeDAO();
+
+		try {
+			for (Time time : (List<Time>) times) {
+				try {
+					++processedLineCount;
+					count += timeDAO.addToHive(con, time);
+					System.out.println("[W] Warehoused Time " + time);
+				} catch (SQLException e) {
+					logString.append("Warehouse," + processedLineCount + "," + time.getTimeCode() + ","
+							+ LogFile.getErrorMsg(e) + "\n");
+				}
+			}
+			if (logString.length() != 0) {
+				throw (new WarehouseException());
+			}
+			System.out.println("Warehoused data!");
+		} catch (Exception e) {
+			System.out.println("WarehouseException thrown!");
+			LogFile.writeToLogFile(absoluteLogFileName, logString);
+			count = 0;
+			throw (new WarehouseException());
+		} finally {
+			HiveConnection.closeConnection(con);
 		}
 
 		return count;

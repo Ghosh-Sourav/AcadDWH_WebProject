@@ -7,10 +7,10 @@ import java.util.List;
 import javax.servlet.http.Part;
 
 import in.ac.iitkgp.acaddwh.bean.dim.Request;
-import in.ac.iitkgp.acaddwh.dso.ItemDSO;
+//import in.ac.iitkgp.acaddwh.dso.ItemDSO;
 import in.ac.iitkgp.acaddwh.exception.ETLException;
 import in.ac.iitkgp.acaddwh.exception.ExtractException;
-import in.ac.iitkgp.acaddwh.exception.HiveException;
+import in.ac.iitkgp.acaddwh.exception.WarehouseException;
 import in.ac.iitkgp.acaddwh.exception.LoadException;
 import in.ac.iitkgp.acaddwh.exception.TransformException;
 import in.ac.iitkgp.acaddwh.service.ETLService;
@@ -138,12 +138,20 @@ public class ETLDriver implements Runnable {
 			request.setStatus("Transformation completed, Loading...");
 			requestService.updateLog(request);
 
-			resultCount = etlService.load(items, absoluteFileNameWithoutExtn + "-report.txt");			
+			resultCount = etlService.load(items, absoluteFileNameWithoutExtn + "-report.txt");
 			System.out.println("Loaded " + resultCount + " items");
 			request.setStatus("Loading completed, Warehousing...");
 			requestService.updateLog(request);
 
-			ItemDSO.writeTransformedCSV(items, absoluteFileNameWithoutExtn + "-hive.csv");
+			/*
+			 * TO SAVE WAREHOUSED OUTPUT TO "-hive.csv" FILE, UNCOMMENT THE
+			 * FOLLOWING LINE AND CORRESPONDING IMPORT STATEMENT
+			 */
+			// ItemDSO.writeTransformedCSV(items, absoluteFileNameWithoutExtn +
+			// "-hive.csv");
+
+			resultCount = etlService.warehouse(items, absoluteFileNameWithoutExtn + "-report.txt");
+			System.out.println("Warehoused " + resultCount + " items");
 			request.setStatus("ETL Process completed successfully");
 			requestService.updateLog(request);
 
@@ -162,11 +170,11 @@ public class ETLDriver implements Runnable {
 			request.setStatus("Loading failed, ETL Aborted");
 			requestService.updateLog(request);
 
-		} catch(HiveException e) {
-			System.out.println("Exception encountered!");
+		} catch (WarehouseException e) {
+			System.out.println("Warehousing failed!");
 			request.setStatus("Warehousing failed, ETL completed upto Loading phase");
 			requestService.updateLog(request);
-			
+
 		}
 	}
 

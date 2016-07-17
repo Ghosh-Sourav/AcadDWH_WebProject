@@ -13,8 +13,10 @@ import in.ac.iitkgp.acaddwh.dao.fact.StuLearningDAO;
 import in.ac.iitkgp.acaddwh.exception.ExtractException;
 import in.ac.iitkgp.acaddwh.exception.LoadException;
 import in.ac.iitkgp.acaddwh.exception.TransformException;
+import in.ac.iitkgp.acaddwh.exception.WarehouseException;
 import in.ac.iitkgp.acaddwh.service.ETLService;
 import in.ac.iitkgp.acaddwh.util.DBConnection;
+import in.ac.iitkgp.acaddwh.util.HiveConnection;
 import in.ac.iitkgp.acaddwh.util.LogFile;
 
 public class StuLearningETL implements ETLService<StuLearning> {
@@ -97,7 +99,7 @@ public class StuLearningETL implements ETLService<StuLearning> {
 			for (StuLearning stuLearning : (List<StuLearning>) stuLearnings) {
 				try {
 					++processedLineCount;
-					count += stuLearningDAO.addFact(con, stuLearning);
+					count += stuLearningDAO.addToDB(con, stuLearning);
 					System.out.println("[UC] Loaded StuLearning " + stuLearning);
 				} catch (SQLException e) {
 					logString.append("Load," + processedLineCount + ","
@@ -126,6 +128,45 @@ public class StuLearningETL implements ETLService<StuLearning> {
 			}
 		} finally {
 			DBConnection.closeConnection(con);
+		}
+
+		return count;
+	}
+
+	@SuppressWarnings("unchecked")
+	public int warehouse(List<?> stuLearnings, String absoluteLogFileName) throws WarehouseException {
+		int count = 0, processedLineCount = 0;
+		StringBuffer logString = new StringBuffer();
+
+		Connection con = HiveConnection.getSaveConnection();
+		StuLearningDAO stuLearningDAO = new StuLearningDAO();
+
+		try {
+			for (StuLearning stuLearning : (List<StuLearning>) stuLearnings) {
+				try {
+					++processedLineCount;
+					count += stuLearningDAO.addToHive(con, stuLearning);
+					System.out.println("[W] Warehoused StuLearning " + stuLearning);
+				} catch (SQLException e) {
+					logString.append("Warehouse," + processedLineCount + ","
+							+ stuLearning.getCourseKey().replace(stuLearning.getInstituteKey() + "_", "") + ";"
+							+ stuLearning.getTimeKey().replace(stuLearning.getInstituteKey() + "_", "") + ";"
+							+ stuLearning.getStudentKey().replace(stuLearning.getInstituteKey() + "_", "") + ";"
+							+ stuLearning.getRegtypeKey().replace(stuLearning.getInstituteKey() + "_", "") + ","
+							+ LogFile.getErrorMsg(e) + "\n");
+				}
+			}
+			if (logString.length() != 0) {
+				throw (new WarehouseException());
+			}
+			System.out.println("Warehoused data!");
+		} catch (Exception e) {
+			System.out.println("WarehouseException thrown!");
+			LogFile.writeToLogFile(absoluteLogFileName, logString);
+			count = 0;
+			throw (new WarehouseException());
+		} finally {
+			HiveConnection.closeConnection(con);
 		}
 
 		return count;

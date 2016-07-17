@@ -8,14 +8,14 @@ import java.util.List;
 import in.ac.iitkgp.acaddwh.bean.Test;
 import in.ac.iitkgp.acaddwh.config.HiveInfo;
 import in.ac.iitkgp.acaddwh.dao.TestDAO;
-import in.ac.iitkgp.acaddwh.exception.HiveException;
+import in.ac.iitkgp.acaddwh.exception.WarehouseException;
 import in.ac.iitkgp.acaddwh.util.HiveConnection;
 import in.ac.iitkgp.acaddwh.util.LogFile;
 
 public class TestHiveLoad {
 
 	@SuppressWarnings("unchecked")
-	public int load(List<?> tests, String absoluteLogFileName) throws HiveException {
+	public int load(List<?> tests, String absoluteLogFileName) throws WarehouseException {
 		int count = 0, processedLineCount = 0;
 		StringBuffer logString = new StringBuffer();
 
@@ -42,7 +42,7 @@ public class TestHiveLoad {
 				}
 			}
 			if (logString.length() != 0) {
-				throw (new HiveException());
+				throw (new WarehouseException());
 			}
 			System.out.println("Submitted for warehousing!");
 		} catch (Exception e) {
@@ -52,7 +52,7 @@ public class TestHiveLoad {
 			//LogFile.writeToLogFile(absoluteLogFileName, logString);
 			count = 0;
 			e.printStackTrace();
-			throw (new HiveException());
+			throw (new WarehouseException());
 		} finally {
 			HiveConnection.closeConnection(con);
 		}
@@ -75,7 +75,7 @@ public class TestHiveLoad {
 			System.out.println(HiveInfo.getUrl());
 			testHiveLoad.load(tests, "");
 			System.out.println("Finished with success!");
-		} catch (HiveException e) {
+		} catch (WarehouseException e) {
 			e.printStackTrace();
 		}
 		System.out.println();

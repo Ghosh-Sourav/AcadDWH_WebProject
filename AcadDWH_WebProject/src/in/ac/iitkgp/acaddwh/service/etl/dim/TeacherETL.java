@@ -13,8 +13,10 @@ import in.ac.iitkgp.acaddwh.dao.dim.TeacherDAO;
 import in.ac.iitkgp.acaddwh.exception.ExtractException;
 import in.ac.iitkgp.acaddwh.exception.LoadException;
 import in.ac.iitkgp.acaddwh.exception.TransformException;
+import in.ac.iitkgp.acaddwh.exception.WarehouseException;
 import in.ac.iitkgp.acaddwh.service.ETLService;
 import in.ac.iitkgp.acaddwh.util.DBConnection;
+import in.ac.iitkgp.acaddwh.util.HiveConnection;
 import in.ac.iitkgp.acaddwh.util.LogFile;
 
 public class TeacherETL implements ETLService<Teacher> {
@@ -41,7 +43,8 @@ public class TeacherETL implements ETLService<Teacher> {
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
-			logString.append("Extract," + teachers.size() + ",Not Extracted,Data format is invalid - Further lines ignored\n");
+			logString.append(
+					"Extract," + teachers.size() + ",Not Extracted,Data format is invalid - Further lines ignored\n");
 			LogFile.writeToLogFile(absoluteLogFileName, logString);
 			throw (new ExtractException());
 		} finally {
@@ -85,7 +88,7 @@ public class TeacherETL implements ETLService<Teacher> {
 			for (Teacher teacher : (List<Teacher>) teachers) {
 				try {
 					++processedLineCount;
-					count += teacherDAO.addDim(con, teacher);
+					count += teacherDAO.addToDB(con, teacher);
 					System.out.println("[UC] Loaded Teacher " + teacher);
 				} catch (SQLException e) {
 					logString.append("Load," + processedLineCount + "," + teacher.getTeacherCode() + ","
@@ -110,6 +113,41 @@ public class TeacherETL implements ETLService<Teacher> {
 			}
 		} finally {
 			DBConnection.closeConnection(con);
+		}
+
+		return count;
+	}
+
+	@SuppressWarnings("unchecked")
+	public int warehouse(List<?> teachers, String absoluteLogFileName) throws WarehouseException {
+		int count = 0, processedLineCount = 0;
+		StringBuffer logString = new StringBuffer();
+
+		Connection con = HiveConnection.getSaveConnection();
+		TeacherDAO teacherDAO = new TeacherDAO();
+
+		try {
+			for (Teacher teacher : (List<Teacher>) teachers) {
+				try {
+					++processedLineCount;
+					count += teacherDAO.addToHive(con, teacher);
+					System.out.println("[W] Warehoused Teacher " + teacher);
+				} catch (SQLException e) {
+					logString.append("Warehouse," + processedLineCount + "," + teacher.getTeacherCode() + ","
+							+ LogFile.getErrorMsg(e) + "\n");
+				}
+			}
+			if (logString.length() != 0) {
+				throw (new WarehouseException());
+			}
+			System.out.println("Warehoused data!");
+		} catch (Exception e) {
+			System.out.println("WarehouseException thrown!");
+			LogFile.writeToLogFile(absoluteLogFileName, logString);
+			count = 0;
+			throw (new WarehouseException());
+		} finally {
+			HiveConnection.closeConnection(con);
 		}
 
 		return count;

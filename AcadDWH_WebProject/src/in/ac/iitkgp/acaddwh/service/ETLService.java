@@ -11,5 +11,7 @@ public interface ETLService<T> {
 	public int transform(List<?> items, String uniqueKeyFragment, String absoluteLogFileName) throws TransformException;
 
 	public int load(List<?> items, String absoluteLogFileName) throws LoadException;
+	
+	public int warehouse(List<?> items, String absoluteLogFileName) throws WarehouseException;
 
 }

@@ -66,6 +66,7 @@ public class AccountServiceImpl implements AccountService {
 		try {
 			etlService.transform(institutes, null, null);
 			etlService.load(institutes, null);
+			etlService.warehouse(institutes, null);
 		} catch (ETLException e) {
 			throw (e);
 		}

@@ -13,8 +13,10 @@ import in.ac.iitkgp.acaddwh.dao.fact.SplPerformanceDAO;
 import in.ac.iitkgp.acaddwh.exception.ExtractException;
 import in.ac.iitkgp.acaddwh.exception.LoadException;
 import in.ac.iitkgp.acaddwh.exception.TransformException;
+import in.ac.iitkgp.acaddwh.exception.WarehouseException;
 import in.ac.iitkgp.acaddwh.service.ETLService;
 import in.ac.iitkgp.acaddwh.util.DBConnection;
+import in.ac.iitkgp.acaddwh.util.HiveConnection;
 import in.ac.iitkgp.acaddwh.util.LogFile;
 
 public class SplPerformanceETL implements ETLService<SplPerformance> {
@@ -93,7 +95,7 @@ public class SplPerformanceETL implements ETLService<SplPerformance> {
 			for (SplPerformance splPerformance : (List<SplPerformance>) splPerformances) {
 				try {
 					++processedLineCount;
-					count += splPerformanceDAO.addFact(con, splPerformance);
+					count += splPerformanceDAO.addToDB(con, splPerformance);
 					System.out.println("[UC] Loaded SplPerformance " + splPerformance);
 				} catch (SQLException e) {
 					logString.append("Load," + processedLineCount + ","
@@ -120,6 +122,43 @@ public class SplPerformanceETL implements ETLService<SplPerformance> {
 			}
 		} finally {
 			DBConnection.closeConnection(con);
+		}
+
+		return count;
+	}
+
+	@SuppressWarnings("unchecked")
+	public int warehouse(List<?> splPerformances, String absoluteLogFileName) throws WarehouseException {
+		int count = 0, processedLineCount = 0;
+		StringBuffer logString = new StringBuffer();
+
+		Connection con = HiveConnection.getSaveConnection();
+		SplPerformanceDAO splPerformanceDAO = new SplPerformanceDAO();
+
+		try {
+			for (SplPerformance splPerformance : (List<SplPerformance>) splPerformances) {
+				try {
+					++processedLineCount;
+					count += splPerformanceDAO.addToHive(con, splPerformance);
+					System.out.println("[W] Warehoused SplPerformance " + splPerformance);
+				} catch (SQLException e) {
+					logString.append("Warehouse," + processedLineCount + ","
+							+ splPerformance.getSplKey().replace(splPerformance.getInstituteKey() + "_", "") + ";"
+							+ splPerformance.getTimeKey().replace(splPerformance.getInstituteKey() + "_", "") + ","
+							+ LogFile.getErrorMsg(e) + "\n");
+				}
+			}
+			if (logString.length() != 0) {
+				throw (new WarehouseException());
+			}
+			System.out.println("Warehoused data!");
+		} catch (Exception e) {
+			System.out.println("WarehouseException thrown!");
+			LogFile.writeToLogFile(absoluteLogFileName, logString);
+			count = 0;
+			throw (new WarehouseException());
+		} finally {
+			HiveConnection.closeConnection(con);
 		}
 
 		return count;

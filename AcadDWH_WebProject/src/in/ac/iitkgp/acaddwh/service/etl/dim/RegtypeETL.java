@@ -13,8 +13,10 @@ import in.ac.iitkgp.acaddwh.dao.dim.RegtypeDAO;
 import in.ac.iitkgp.acaddwh.exception.ExtractException;
 import in.ac.iitkgp.acaddwh.exception.LoadException;
 import in.ac.iitkgp.acaddwh.exception.TransformException;
+import in.ac.iitkgp.acaddwh.exception.WarehouseException;
 import in.ac.iitkgp.acaddwh.service.ETLService;
 import in.ac.iitkgp.acaddwh.util.DBConnection;
+import in.ac.iitkgp.acaddwh.util.HiveConnection;
 import in.ac.iitkgp.acaddwh.util.LogFile;
 
 public class RegtypeETL implements ETLService<Regtype> {
@@ -40,7 +42,8 @@ public class RegtypeETL implements ETLService<Regtype> {
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
-			logString.append("Extract," + regtypes.size() + ",Not Extracted,Data format is invalid - Further lines ignored\n");
+			logString.append(
+					"Extract," + regtypes.size() + ",Not Extracted,Data format is invalid - Further lines ignored\n");
 			LogFile.writeToLogFile(absoluteLogFileName, logString);
 			throw (new ExtractException());
 		} finally {
@@ -84,7 +87,7 @@ public class RegtypeETL implements ETLService<Regtype> {
 			for (Regtype regtype : (List<Regtype>) regtypes) {
 				try {
 					++processedLineCount;
-					count += regtypeDAO.addDim(con, regtype);
+					count += regtypeDAO.addToDB(con, regtype);
 					System.out.println("[UC] Loaded Regtype " + regtype);
 				} catch (SQLException e) {
 					logString.append("Load," + processedLineCount + "," + regtype.getRegtypeCode() + ","
@@ -109,6 +112,41 @@ public class RegtypeETL implements ETLService<Regtype> {
 			}
 		} finally {
 			DBConnection.closeConnection(con);
+		}
+
+		return count;
+	}
+
+	@SuppressWarnings("unchecked")
+	public int warehouse(List<?> regtypes, String absoluteLogFileName) throws WarehouseException {
+		int count = 0, processedLineCount = 0;
+		StringBuffer logString = new StringBuffer();
+
+		Connection con = HiveConnection.getSaveConnection();
+		RegtypeDAO regtypeDAO = new RegtypeDAO();
+
+		try {
+			for (Regtype regtype : (List<Regtype>) regtypes) {
+				try {
+					++processedLineCount;
+					count += regtypeDAO.addToHive(con, regtype);
+					System.out.println("[W] Warehoused Regtype " + regtype);
+				} catch (SQLException e) {
+					logString.append("Warehouse," + processedLineCount + "," + regtype.getRegtypeCode() + ","
+							+ LogFile.getErrorMsg(e) + "\n");
+				}
+			}
+			if (logString.length() != 0) {
+				throw (new WarehouseException());
+			}
+			System.out.println("Warehoused data!");
+		} catch (Exception e) {
+			System.out.println("WarehouseException thrown!");
+			LogFile.writeToLogFile(absoluteLogFileName, logString);
+			count = 0;
+			throw (new WarehouseException());
+		} finally {
+			HiveConnection.closeConnection(con);
 		}
 
 		return count;
