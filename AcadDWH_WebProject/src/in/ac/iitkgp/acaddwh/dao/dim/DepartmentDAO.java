@@ -4,7 +4,6 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 
-import in.ac.iitkgp.acaddwh.background.Warehouser;
 import in.ac.iitkgp.acaddwh.bean.dim.Department;
 
 public class DepartmentDAO {
@@ -41,9 +40,11 @@ public class DepartmentDAO {
 			ps.setString(3, department.getDeptName());
 			ps.setString(4, department.getDeptDcsType());
 
-			Runnable runnable = new Warehouser(ps);
-			Thread warehouserThread = new Thread(runnable);
-			warehouserThread.start();
+//			Runnable runnable = new Warehouser(ps);
+//			Thread warehouserThread = new Thread(runnable);
+//			warehouserThread.start();
+			
+			returnValue = ps.executeUpdate();
 
 		} finally {
 			if (ps != null) {
