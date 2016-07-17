@@ -7,7 +7,7 @@ import java.util.List;
 import javax.servlet.http.Part;
 
 import in.ac.iitkgp.acaddwh.bean.dim.Request;
-//import in.ac.iitkgp.acaddwh.dso.ItemDSO;
+import in.ac.iitkgp.acaddwh.dso.ItemDSO;
 import in.ac.iitkgp.acaddwh.exception.ETLException;
 import in.ac.iitkgp.acaddwh.exception.ExtractException;
 import in.ac.iitkgp.acaddwh.exception.WarehouseException;
@@ -147,8 +147,7 @@ public class ETLDriver implements Runnable {
 			 * TO SAVE WAREHOUSED OUTPUT TO "-hive.csv" FILE, UNCOMMENT THE
 			 * FOLLOWING LINE AND CORRESPONDING IMPORT STATEMENT
 			 */
-			// ItemDSO.writeTransformedCSV(items, absoluteFileNameWithoutExtn +
-			// "-hive.csv");
+			ItemDSO.writeTransformedCSV(items, absoluteFileNameWithoutExtn + "-hive.csv");
 
 			resultCount = etlService.warehouse(items, absoluteFileNameWithoutExtn + "-report.txt");
 			System.out.println("Warehoused " + resultCount + " items");
