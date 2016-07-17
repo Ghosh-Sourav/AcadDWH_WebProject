@@ -32,7 +32,7 @@ public class RegtypeDAO {
 		PreparedStatement ps = null;
 
 		try {
-			ps = con.prepareStatement("insert into acaddwh.dim_regtypes select ?,?,? from acaddwh.dummy limit 1");
+			ps = con.prepareStatement("insert into table acaddwh.dim_regtypes select ?,?,? from acaddwh.dummy limit 1");
 			ps.setString(1, regtype.getRegtypeKey());
 			ps.setString(2, regtype.getRegtypeCode());
 			ps.setString(3, regtype.getRegtypeDesc());

@@ -40,7 +40,7 @@ public class StuLearningDAO {
 		PreparedStatement ps = null;
 
 		try {
-			ps = con.prepareStatement("insert into acaddwh.fact_stu_learning select ?,?,?,?,?,?,?,?,?,?,? from acaddwh.dummy limit 1");
+			ps = con.prepareStatement("insert into table acaddwh.fact_stu_learning select ?,?,?,?,?,?,?,?,?,?,? from acaddwh.dummy limit 1");
 			ps.setString(1, stuLearning.getInstituteKey());
 			ps.setString(2, stuLearning.getCourseKey());
 			ps.setString(3, stuLearning.getTimeKey());

@@ -33,7 +33,7 @@ public class TimeDAO {
 		PreparedStatement ps = null;
 
 		try {
-			ps = con.prepareStatement("insert into acaddwh.dim_times select ?,?,?,? from acaddwh.dummy limit 1");
+			ps = con.prepareStatement("insert into table acaddwh.dim_times select ?,?,?,? from acaddwh.dummy limit 1");
 			ps.setString(1, time.getTimeKey());
 			ps.setString(2, time.getTimeCode());
 			ps.setString(3, time.getAcadsemester());

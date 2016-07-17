@@ -34,7 +34,7 @@ public class TeacherDAO {
 		PreparedStatement ps = null;
 		
 		try {
-			ps = con.prepareStatement("insert into acaddwh.dim_teachers select ?,?,?,? from acaddwh.dummy limit 1");
+			ps = con.prepareStatement("insert into table acaddwh.dim_teachers select ?,?,?,? from acaddwh.dummy limit 1");
 			ps.setString(1, teacher.getTeacherKey());
 			ps.setString(2, teacher.getTeacherCode());
 			ps.setString(3, teacher.getTeacherDept());

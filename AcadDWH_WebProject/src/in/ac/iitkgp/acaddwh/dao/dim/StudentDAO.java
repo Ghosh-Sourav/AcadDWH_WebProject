@@ -35,7 +35,7 @@ public class StudentDAO {
 		PreparedStatement ps = null;
 
 		try {
-			ps = con.prepareStatement("insert into acaddwh.dim_students select ?,?,?,?,?,? from acaddwh.dummy limit 1");
+			ps = con.prepareStatement("insert into table acaddwh.dim_students select ?,?,?,?,?,? from acaddwh.dummy limit 1");
 			ps.setString(1, student.getStudentKey());
 			ps.setString(2, student.getStudentCode());
 			ps.setString(3, student.getSplKey());

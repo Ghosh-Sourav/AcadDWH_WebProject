@@ -32,7 +32,7 @@ public class InstituteDAO {
 		PreparedStatement ps = null;
 
 		try {
-			ps = con.prepareStatement("insert into acaddwh.dim_institute select ?,?,? from acaddwh.dummy limit 1");
+			ps = con.prepareStatement("insert into table acaddwh.dim_institute select ?,?,? from acaddwh.dummy limit 1");
 			ps.setString(1, institute.getInstituteKey());
 			ps.setString(2, institute.getInstituteName());
 			ps.setString(3, institute.getInstitutePassword());

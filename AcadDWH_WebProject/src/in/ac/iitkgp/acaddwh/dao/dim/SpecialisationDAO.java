@@ -35,7 +35,7 @@ public class SpecialisationDAO {
 		PreparedStatement ps = null;
 
 		try {
-			ps = con.prepareStatement("insert into acaddwh.dim_specialisations select ?,?,?,?,?,? from acaddwh.dummy limit 1");
+			ps = con.prepareStatement("insert into table acaddwh.dim_specialisations select ?,?,?,?,?,? from acaddwh.dummy limit 1");
 			ps.setString(1, specialisation.getSplKey());
 			ps.setString(2, specialisation.getSplCode());
 			ps.setString(3, specialisation.getSplName());

@@ -38,7 +38,7 @@ public class SplPerformanceDAO {
 		PreparedStatement ps = null;
 
 		try {
-			ps = con.prepareStatement("insert into acaddwh.fact_spl_performance select ?,?,?,?,?,?,?,?,? from acaddwh.dummy limit 1");
+			ps = con.prepareStatement("insert into table acaddwh.fact_spl_performance select ?,?,?,?,?,?,?,?,? from acaddwh.dummy limit 1");
 			ps.setString(1, splPerformance.getInstituteKey());
 			ps.setString(2, splPerformance.getSplKey());
 			ps.setString(3, splPerformance.getTimeKey());

@@ -36,7 +36,7 @@ public class TeachingQualityDAO {
 		PreparedStatement ps = null;
 
 		try {
-			ps = con.prepareStatement("insert into acaddwh.fact_teaching_quality select ?,?,?,?,?,?,? from acaddwh.dummy limit 1");
+			ps = con.prepareStatement("insert into table acaddwh.fact_teaching_quality select ?,?,?,?,?,?,? from acaddwh.dummy limit 1");
 			ps.setString(1, teachingQuality.getInstituteKey());
 			ps.setString(2, teachingQuality.getCourseKey());
 			ps.setString(3, teachingQuality.getTimeKey());

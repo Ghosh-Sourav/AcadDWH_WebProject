@@ -39,7 +39,7 @@ public class CourseDAO {
 		PreparedStatement ps = null;
 
 		try {
-			ps = con.prepareStatement("insert into acaddwh.dim_courses select ?,?,?,?,?,?,?,?,?,? from acaddwh.dummy limit 1");
+			ps = con.prepareStatement("insert into table acaddwh.dim_courses select ?,?,?,?,?,?,?,?,?,? from acaddwh.dummy limit 1");
 			ps.setString(1, course.getCourseKey());
 			ps.setString(2, course.getCourseCode());
 			ps.setString(3, course.getCourseName());
