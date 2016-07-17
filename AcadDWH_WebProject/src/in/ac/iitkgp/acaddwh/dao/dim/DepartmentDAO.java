@@ -27,13 +27,14 @@ public class DepartmentDAO {
 		}
 		return returnValue;
 	}
-	
+
 	public int addToHive(Connection con, Department department) throws SQLException {
 		int returnValue = 0;
 		PreparedStatement ps = null;
 
 		try {
-			ps = con.prepareStatement("insert into table acaddwh.dim_departments select ?,?,?,? from acaddwh.dummy limit 1");
+			ps = con.prepareStatement(
+					"insert into table acaddwh.dim_departments select ?,?,?,? from acaddwh.dummy limit 1");
 			ps.setString(1, department.getDeptKey());
 			ps.setString(2, department.getDeptCode());
 			ps.setString(3, department.getDeptName());
@@ -41,6 +42,7 @@ public class DepartmentDAO {
 
 			returnValue = ps.executeUpdate();
 
+		} catch (SQLException e) {
 		} finally {
 			if (ps != null) {
 				ps.close();
