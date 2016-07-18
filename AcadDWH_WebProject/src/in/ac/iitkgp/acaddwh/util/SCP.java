@@ -24,7 +24,7 @@ public class SCP {
 
 			Session session = jsch.getSession(HadoopNodeInfo.getUsername(), HadoopNodeInfo.getHadoopNodeIP(),
 					HadoopNodeInfo.getHadoopNodePort());
-			session.setPassword("");
+			session.setPassword(HadoopNodeInfo.getPassword());
 			session.setConfig("StrictHostKeyChecking", "no");
 			session.connect();
 
