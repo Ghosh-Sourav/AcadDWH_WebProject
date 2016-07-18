@@ -28,21 +28,13 @@ public class DepartmentDAO {
 		return returnValue;
 	}
 
-	public int addToHive(Connection con, Department department) throws SQLException {
+	public int addToHive(Connection con, String hadoopLocalFileName) throws SQLException {
 		int returnValue = 0;
 		PreparedStatement ps = null;
 
 		try {
-			ps = con.prepareStatement(
-					"insert into table acaddwh.dim_departments select ?,?,?,? from acaddwh.dummy limit 1");
-			ps.setString(1, department.getDeptKey());
-			ps.setString(2, department.getDeptCode());
-			ps.setString(3, department.getDeptName());
-			ps.setString(4, department.getDeptDcsType());
-
-//			Runnable runnable = new Warehouser(ps);
-//			Thread warehouserThread = new Thread(runnable);
-//			warehouserThread.start();
+			ps = con.prepareStatement("LOAD DATA LOCAL INPATH ? INTO TABLE acaddwh.dim_departments");
+			ps.setString(1, hadoopLocalFileName);
 			
 			returnValue = ps.executeUpdate();
 

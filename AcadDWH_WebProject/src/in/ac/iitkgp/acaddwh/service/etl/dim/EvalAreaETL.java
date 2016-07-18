@@ -118,38 +118,23 @@ public class EvalAreaETL implements ETLService<EvalArea> {
 		return count;
 	}
 
-	@SuppressWarnings("unchecked")
-	public int warehouse(List<?> evalAreas, String absoluteLogFileName) throws WarehouseException {
-		int count = 0, processedLineCount = 0;
+	public void warehouse(String hadoopLocalFileName, String absoluteLogFileName) throws WarehouseException {
 		StringBuffer logString = new StringBuffer();
 
 		Connection con = HiveConnection.getSaveConnection();
 		EvalAreaDAO evalAreaDAO = new EvalAreaDAO();
 
 		try {
-			for (EvalArea evalArea : (List<EvalArea>) evalAreas) {
-				try {
-					++processedLineCount;
-					count += evalAreaDAO.addToHive(con, evalArea);
-					System.out.println("[W] Warehoused EvalArea " + evalArea);
-				} catch (SQLException e) {
-					logString.append("Warehouse," + processedLineCount + "," + evalArea.getEvalAreaCode() + ","
-							+ LogFile.getErrorMsg(e) + "\n");
-				}
-			}
-			if (logString.length() != 0) {
-				throw (new WarehouseException());
-			}
-			System.out.println("Warehoused data!");
-		} catch (Exception e) {
+			evalAreaDAO.addToHive(con, hadoopLocalFileName);
+			System.out.println("[W] Warehoused EvalArea file: " + hadoopLocalFileName);
+
+		} catch (SQLException e) {
 			System.out.println("WarehouseException thrown!");
+			logString.append("Warehouse," + "-" + "," + "-" + "," + LogFile.getErrorMsg(e) + "\n");
 			LogFile.writeToLogFile(absoluteLogFileName, logString);
-			count = 0;
 			throw (new WarehouseException());
 		} finally {
 			HiveConnection.closeConnection(con);
 		}
-
-		return count;
 	}
 }

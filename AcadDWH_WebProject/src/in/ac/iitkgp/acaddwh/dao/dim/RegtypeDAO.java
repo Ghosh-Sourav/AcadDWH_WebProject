@@ -26,16 +26,14 @@ public class RegtypeDAO {
 		}
 		return returnValue;
 	}
-	
-	public int addToHive(Connection con, Regtype regtype) throws SQLException {
+
+	public int addToHive(Connection con, String hadoopLocalFileName) throws SQLException {
 		int returnValue = 0;
 		PreparedStatement ps = null;
 
 		try {
-			ps = con.prepareStatement("insert into table acaddwh.dim_regtypes select ?,?,? from acaddwh.dummy limit 1");
-			ps.setString(1, regtype.getRegtypeKey());
-			ps.setString(2, regtype.getRegtypeCode());
-			ps.setString(3, regtype.getRegtypeDesc());
+			ps = con.prepareStatement("LOAD DATA LOCAL INPATH ? INTO TABLE acaddwh.dim_regtypes");
+			ps.setString(1, hadoopLocalFileName);
 
 			returnValue = ps.executeUpdate();
 

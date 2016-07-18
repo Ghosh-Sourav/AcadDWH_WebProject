@@ -129,42 +129,23 @@ public class TeachingQualityETL implements ETLService<TeachingQuality> {
 		return count;
 	}
 
-	@SuppressWarnings("unchecked")
-	public int warehouse(List<?> teachingQualitys, String absoluteLogFileName) throws WarehouseException {
-		int count = 0, processedLineCount = 0;
+	public void warehouse(String hadoopLocalFileName, String absoluteLogFileName) throws WarehouseException {
 		StringBuffer logString = new StringBuffer();
 
 		Connection con = HiveConnection.getSaveConnection();
 		TeachingQualityDAO teachingQualityDAO = new TeachingQualityDAO();
 
 		try {
-			for (TeachingQuality teachingQuality : (List<TeachingQuality>) teachingQualitys) {
-				try {
-					++processedLineCount;
-					count += teachingQualityDAO.addToHive(con, teachingQuality);
-					System.out.println("[W] Warehoused TeachingQuality " + teachingQuality);
-				} catch (SQLException e) {
-					logString.append("Warehouse," + processedLineCount + ","
-							+ teachingQuality.getCourseKey().replace(teachingQuality.getInstituteKey() + "_", "") + ";"
-							+ teachingQuality.getTimeKey().replace(teachingQuality.getInstituteKey() + "_", "") + ";"
-							+ teachingQuality.getTeacherKey().replace(teachingQuality.getInstituteKey() + "_", "") + ";"
-							+ teachingQuality.getEvalAreaKey().replace(teachingQuality.getInstituteKey() + "_", "")
-							+ "," + LogFile.getErrorMsg(e) + "\n");
-				}
-			}
-			if (logString.length() != 0) {
-				throw (new WarehouseException());
-			}
-			System.out.println("Warehoused data!");
-		} catch (Exception e) {
+			teachingQualityDAO.addToHive(con, hadoopLocalFileName);
+			System.out.println("[W] Warehoused TeachingQuality file: " + hadoopLocalFileName);
+
+		} catch (SQLException e) {
 			System.out.println("WarehouseException thrown!");
+			logString.append("Warehouse," + "-" + "," + "-" + "," + LogFile.getErrorMsg(e) + "\n");
 			LogFile.writeToLogFile(absoluteLogFileName, logString);
-			count = 0;
 			throw (new WarehouseException());
 		} finally {
 			HiveConnection.closeConnection(con);
 		}
-
-		return count;
 	}
 }

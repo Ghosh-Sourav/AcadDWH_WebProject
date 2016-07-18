@@ -26,16 +26,14 @@ public class InstituteDAO {
 		}
 		return returnValue;
 	}
-	
-	public int addToHive(Connection con, Institute institute) throws SQLException {
+
+	public int addToHive(Connection con, String hadoopLocalFileName) throws SQLException {
 		int returnValue = 0;
 		PreparedStatement ps = null;
 
 		try {
-			ps = con.prepareStatement("insert into table acaddwh.dim_institute select ?,?,? from acaddwh.dummy limit 1");
-			ps.setString(1, institute.getInstituteKey());
-			ps.setString(2, institute.getInstituteName());
-			ps.setString(3, institute.getInstitutePassword());
+			ps = con.prepareStatement("LOAD DATA LOCAL INPATH ? INTO TABLE acaddwh.dim_institute");
+			ps.setString(1, hadoopLocalFileName);
 
 			returnValue = ps.executeUpdate();
 

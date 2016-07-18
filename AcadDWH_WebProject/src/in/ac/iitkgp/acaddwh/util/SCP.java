@@ -7,13 +7,23 @@ import com.jcraft.jsch.ChannelSftp;
 import com.jcraft.jsch.JSch;
 import com.jcraft.jsch.Session;
 
+import in.ac.iitkgp.acaddwh.config.HadoopNodeInfo;
+import in.ac.iitkgp.acaddwh.exception.WarehouseException;
+
 public class SCP {
 
-	public static void main(String[] args) {
+	/*
+	 * Example: localFileName =
+	 * "/home/sourav/AcadDWH/AcadDWH_Data/20160718035530444_IITKGP_dim_departments-hive.csv"
+	 */
+	public static String sendToHadoopNode(String localFileName) throws WarehouseException {
+
+		String hadoopLocalFileName = null;
 		try {
 			JSch jsch = new JSch();
 
-			Session session = jsch.getSession("15CS60R16", "10.5.30.101", 22);
+			Session session = jsch.getSession(HadoopNodeInfo.getUsername(), HadoopNodeInfo.getHadoopNodeIP(),
+					HadoopNodeInfo.getHadoopNodePort());
 			session.setPassword("");
 			session.setConfig("StrictHostKeyChecking", "no");
 			session.connect();
@@ -21,20 +31,24 @@ public class SCP {
 			ChannelSftp channel = (ChannelSftp) session.openChannel("sftp");
 			channel.connect();
 
-			File localFile = new File("/home/sourav/AcadDWH/AcadDWH_Data/20160718035530444_IITKGP_dim_departments-hive.csv");
-			// If you want you can change the directory using the following
-			// line.
-			
-			channel.cd("/home/mtech/15CS60R16/AcadDWH_Data");
+			File localFile = new File(localFileName);
+
+			channel.cd(HadoopNodeInfo.getPathInHadoopLocal());
 			channel.put(new FileInputStream(localFile), localFile.getName());
-			
+
 			channel.disconnect();
 			session.disconnect();
-			System.out.println("Sent");
-			
+
+			hadoopLocalFileName = HadoopNodeInfo.getPathInHadoopLocal() + localFile.getName();
+			System.out.println("Sent file " + localFileName + " over SCP; saved as " + hadoopLocalFileName);
+
 		} catch (Exception e) {
+			System.out.println("Failed to send file " + localFileName + " over SCP due to: " + e.getMessage());
 			e.printStackTrace();
+			throw (new WarehouseException());
 		}
+
+		return hadoopLocalFileName;
 	}
 
 }

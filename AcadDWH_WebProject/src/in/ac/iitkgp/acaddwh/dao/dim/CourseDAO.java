@@ -34,23 +34,14 @@ public class CourseDAO {
 		return returnValue;
 	}
 	
-	public int addToHive(Connection con, Course course) throws SQLException {
+	public int addToHive(Connection con, String hadoopLocalFileName) throws SQLException {
 		int returnValue = 0;
 		PreparedStatement ps = null;
 
 		try {
-			ps = con.prepareStatement("insert into table acaddwh.dim_courses select ?,?,?,?,?,?,?,?,?,? from acaddwh.dummy limit 1");
-			ps.setString(1, course.getCourseKey());
-			ps.setString(2, course.getCourseCode());
-			ps.setString(3, course.getCourseName());
-			ps.setString(4, course.getCourseType());
-			ps.setString(5, course.getCourseDept());
-			ps.setInt(6, course.getCourseCrd());
-			ps.setInt(7, course.getCourseLectureHour());
-			ps.setInt(8, course.getCourseTutorialHour());
-			ps.setInt(9, course.getCoursePracticalHour());
-			ps.setString(10, course.getCourseLevel());
-
+			ps = con.prepareStatement("LOAD DATA LOCAL INPATH ? INTO TABLE acaddwh.dim_courses");
+			ps.setString(1, hadoopLocalFileName);
+			
 			returnValue = ps.executeUpdate();
 
 		} finally {

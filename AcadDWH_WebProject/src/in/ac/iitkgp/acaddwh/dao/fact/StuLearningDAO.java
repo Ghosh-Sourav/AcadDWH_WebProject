@@ -34,24 +34,14 @@ public class StuLearningDAO {
 		}
 		return returnValue;
 	}
-	
-	public int addToHive(Connection con, StuLearning stuLearning) throws SQLException {
+
+	public int addToHive(Connection con, String hadoopLocalFileName) throws SQLException {
 		int returnValue = 0;
 		PreparedStatement ps = null;
 
 		try {
-			ps = con.prepareStatement("insert into table acaddwh.fact_stu_learning select ?,?,?,?,?,?,?,?,?,?,? from acaddwh.dummy limit 1");
-			ps.setString(1, stuLearning.getInstituteKey());
-			ps.setString(2, stuLearning.getCourseKey());
-			ps.setString(3, stuLearning.getTimeKey());
-			ps.setString(4, stuLearning.getStudentKey());
-			ps.setString(5, stuLearning.getRegtypeKey());
-			ps.setString(6, stuLearning.getGrade());
-			ps.setInt(7, stuLearning.getNumGrade());
-			ps.setFloat(8, stuLearning.getImprFactor());
-			ps.setFloat(9, stuLearning.getPrFnImpr());
-			ps.setFloat(10, stuLearning.getPrPsImpr());
-			ps.setFloat(11, stuLearning.getPercentAttended());
+			ps = con.prepareStatement("LOAD DATA LOCAL INPATH ? INTO TABLE acaddwh.fact_stu_learning");
+			ps.setString(1, hadoopLocalFileName);
 
 			returnValue = ps.executeUpdate();
 

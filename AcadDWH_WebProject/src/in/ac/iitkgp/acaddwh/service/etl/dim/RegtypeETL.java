@@ -117,38 +117,23 @@ public class RegtypeETL implements ETLService<Regtype> {
 		return count;
 	}
 
-	@SuppressWarnings("unchecked")
-	public int warehouse(List<?> regtypes, String absoluteLogFileName) throws WarehouseException {
-		int count = 0, processedLineCount = 0;
+	public void warehouse(String hadoopLocalFileName, String absoluteLogFileName) throws WarehouseException {
 		StringBuffer logString = new StringBuffer();
 
 		Connection con = HiveConnection.getSaveConnection();
 		RegtypeDAO regtypeDAO = new RegtypeDAO();
 
 		try {
-			for (Regtype regtype : (List<Regtype>) regtypes) {
-				try {
-					++processedLineCount;
-					count += regtypeDAO.addToHive(con, regtype);
-					System.out.println("[W] Warehoused Regtype " + regtype);
-				} catch (SQLException e) {
-					logString.append("Warehouse," + processedLineCount + "," + regtype.getRegtypeCode() + ","
-							+ LogFile.getErrorMsg(e) + "\n");
-				}
-			}
-			if (logString.length() != 0) {
-				throw (new WarehouseException());
-			}
-			System.out.println("Warehoused data!");
-		} catch (Exception e) {
+			regtypeDAO.addToHive(con, hadoopLocalFileName);
+			System.out.println("[W] Warehoused Regtype file: " + hadoopLocalFileName);
+
+		} catch (SQLException e) {
 			System.out.println("WarehouseException thrown!");
+			logString.append("Warehouse," + "-" + "," + "-" + "," + LogFile.getErrorMsg(e) + "\n");
 			LogFile.writeToLogFile(absoluteLogFileName, logString);
-			count = 0;
 			throw (new WarehouseException());
 		} finally {
 			HiveConnection.closeConnection(con);
 		}
-
-		return count;
 	}
 }

@@ -26,16 +26,14 @@ public class EvalAreaDAO {
 		}
 		return returnValue;
 	}
-	
-	public int addToHive(Connection con, EvalArea evalArea) throws SQLException {
+
+	public int addToHive(Connection con, String hadoopLocalFileName) throws SQLException {
 		int returnValue = 0;
 		PreparedStatement ps = null;
 
 		try {
-			ps = con.prepareStatement("insert into table acaddwh.dim_eval_areas select ?,?,? from acaddwh.dummy limit 1");
-			ps.setString(1, evalArea.getEvalAreaKey());
-			ps.setString(2, evalArea.getEvalAreaCode());
-			ps.setString(3, evalArea.getEvalArea());
+			ps = con.prepareStatement("LOAD DATA LOCAL INPATH ? INTO TABLE acaddwh.dim_eval_areas");
+			ps.setString(1, hadoopLocalFileName);
 
 			returnValue = ps.executeUpdate();
 

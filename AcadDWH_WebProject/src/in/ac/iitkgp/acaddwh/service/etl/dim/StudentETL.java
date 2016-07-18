@@ -122,38 +122,23 @@ public class StudentETL implements ETLService<Student> {
 		return count;
 	}
 
-	@SuppressWarnings("unchecked")
-	public int warehouse(List<?> students, String absoluteLogFileName) throws WarehouseException {
-		int count = 0, processedLineCount = 0;
+	public void warehouse(String hadoopLocalFileName, String absoluteLogFileName) throws WarehouseException {
 		StringBuffer logString = new StringBuffer();
 
 		Connection con = HiveConnection.getSaveConnection();
 		StudentDAO studentDAO = new StudentDAO();
 
 		try {
-			for (Student student : (List<Student>) students) {
-				try {
-					++processedLineCount;
-					count += studentDAO.addToHive(con, student);
-					System.out.println("[W] Warehoused Student " + student);
-				} catch (SQLException e) {
-					logString.append("Warehouse," + processedLineCount + "," + student.getStudentCode() + ","
-							+ LogFile.getErrorMsg(e) + "\n");
-				}
-			}
-			if (logString.length() != 0) {
-				throw (new WarehouseException());
-			}
-			System.out.println("Warehoused data!");
-		} catch (Exception e) {
+			studentDAO.addToHive(con, hadoopLocalFileName);
+			System.out.println("[W] Warehoused Student file: " + hadoopLocalFileName);
+
+		} catch (SQLException e) {
 			System.out.println("WarehouseException thrown!");
+			logString.append("Warehouse," + "-" + "," + "-" + "," + LogFile.getErrorMsg(e) + "\n");
 			LogFile.writeToLogFile(absoluteLogFileName, logString);
-			count = 0;
 			throw (new WarehouseException());
 		} finally {
 			HiveConnection.closeConnection(con);
 		}
-
-		return count;
 	}
 }

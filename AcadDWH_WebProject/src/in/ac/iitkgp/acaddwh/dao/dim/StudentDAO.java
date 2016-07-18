@@ -29,19 +29,14 @@ public class StudentDAO {
 		}
 		return returnValue;
 	}
-	
-	public int addToHive(Connection con, Student student) throws SQLException {
+
+	public int addToHive(Connection con, String hadoopLocalFileName) throws SQLException {
 		int returnValue = 0;
 		PreparedStatement ps = null;
 
 		try {
-			ps = con.prepareStatement("insert into table acaddwh.dim_students select ?,?,?,?,?,? from acaddwh.dummy limit 1");
-			ps.setString(1, student.getStudentKey());
-			ps.setString(2, student.getStudentCode());
-			ps.setString(3, student.getSplKey());
-			ps.setString(4, student.getStudentNoa());
-			ps.setString(5, student.getStudentNoa());
-			ps.setInt(6, student.getAdmissionYear());
+			ps = con.prepareStatement("LOAD DATA LOCAL INPATH ? INTO TABLE acaddwh.dim_students");
+			ps.setString(1, hadoopLocalFileName);
 
 			returnValue = ps.executeUpdate();
 
@@ -52,6 +47,5 @@ public class StudentDAO {
 		}
 		return returnValue;
 	}
-
 
 }

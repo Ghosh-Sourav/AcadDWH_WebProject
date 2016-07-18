@@ -46,7 +46,7 @@ public class TestDAO {
 
 		try {
 			String hadoopMachineLocalFilePath = "/home/mtech/15CS60R16/AcadDWH/20160718031631256_IITKGP_dim_departments-hive.csv";
-			String hdfsFilePath = "/user/15CS60R16/AcadDWH/test_table_data.csv";
+			//String hdfsFilePath = "/user/15CS60R16/AcadDWH/test_table_data.csv";
 
 			// ps = con.prepareStatement("insert into table test_table select ?,
 			// ? from dummy");

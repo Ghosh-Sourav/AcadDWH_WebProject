@@ -18,6 +18,7 @@ import in.ac.iitkgp.acaddwh.service.RequestService;
 import in.ac.iitkgp.acaddwh.service.etl.dim.*;
 import in.ac.iitkgp.acaddwh.service.etl.fact.*;
 import in.ac.iitkgp.acaddwh.service.impl.RequestServiceImpl;
+import in.ac.iitkgp.acaddwh.util.SCP;
 
 public class ETLDriver implements Runnable {
 
@@ -144,13 +145,13 @@ public class ETLDriver implements Runnable {
 			requestService.updateLog(request);
 
 			/*
-			 * TO SAVE WAREHOUSED OUTPUT TO "-hive.csv" FILE, UNCOMMENT THE
-			 * FOLLOWING LINE AND CORRESPONDING IMPORT STATEMENT
+			 * Save warehoused output to "-hive.csv" file, and send to hadoop node
 			 */
 			ItemDSO.writeTransformedCSV(items, absoluteFileNameWithoutExtn + "-hive.csv");
+			String hadoopLocalFileName = SCP.sendToHadoopNode(absoluteFileNameWithoutExtn + "-hive.csv");
 
-			resultCount = etlService.warehouse(items, absoluteFileNameWithoutExtn + "-report.txt");
-			System.out.println("Warehoused " + resultCount + " items");
+			etlService.warehouse(hadoopLocalFileName, absoluteFileNameWithoutExtn + "-report.txt");
+			System.out.println("Warehoused " + hadoopLocalFileName);
 			request.setStatus("ETL Process completed successfully");
 			requestService.updateLog(request);
 
@@ -172,6 +173,11 @@ public class ETLDriver implements Runnable {
 		} catch (WarehouseException e) {
 			System.out.println("Warehousing failed!");
 			request.setStatus("Warehousing failed, ETL completed upto Loading phase");
+			requestService.updateLog(request);
+
+		} catch (Exception e) {
+			System.out.println("Exeption occurred!");
+			request.setStatus(request.getStatus() + " Aborted due to: " + e.getMessage());
 			requestService.updateLog(request);
 
 		}

@@ -29,19 +29,14 @@ public class SpecialisationDAO {
 		}
 		return returnValue;
 	}
-	
-	public int addToHive(Connection con, Specialisation specialisation) throws SQLException {
+
+	public int addToHive(Connection con, String hadoopLocalFileName) throws SQLException {
 		int returnValue = 0;
 		PreparedStatement ps = null;
 
 		try {
-			ps = con.prepareStatement("insert into table acaddwh.dim_specialisations select ?,?,?,?,?,? from acaddwh.dummy limit 1");
-			ps.setString(1, specialisation.getSplKey());
-			ps.setString(2, specialisation.getSplCode());
-			ps.setString(3, specialisation.getSplName());
-			ps.setString(4, specialisation.getDeptKey());
-			ps.setString(5, specialisation.getSplDegree());
-			ps.setString(6, specialisation.getSplLevel());
+			ps = con.prepareStatement("LOAD DATA LOCAL INPATH ? INTO TABLE acaddwh.dim_specialisations");
+			ps.setString(1, hadoopLocalFileName);
 
 			returnValue = ps.executeUpdate();
 

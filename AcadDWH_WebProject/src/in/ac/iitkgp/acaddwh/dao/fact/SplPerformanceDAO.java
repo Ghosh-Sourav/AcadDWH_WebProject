@@ -32,22 +32,14 @@ public class SplPerformanceDAO {
 		}
 		return returnValue;
 	}
-	
-	public int addToHive(Connection con, SplPerformance splPerformance) throws SQLException {
+
+	public int addToHive(Connection con, String hadoopLocalFileName) throws SQLException {
 		int returnValue = 0;
 		PreparedStatement ps = null;
 
 		try {
-			ps = con.prepareStatement("insert into table acaddwh.fact_spl_performance select ?,?,?,?,?,?,?,?,? from acaddwh.dummy limit 1");
-			ps.setString(1, splPerformance.getInstituteKey());
-			ps.setString(2, splPerformance.getSplKey());
-			ps.setString(3, splPerformance.getTimeKey());
-			ps.setInt(4, splPerformance.getAdmStuCnt());
-			ps.setInt(5, splPerformance.getOnrollStuCnt());
-			ps.setInt(6, splPerformance.getGradStuCnt());
-			ps.setInt(7, splPerformance.getDropoutStuCnt());
-			ps.setInt(8, splPerformance.getPercentPlaced());
-			ps.setFloat(9, splPerformance.getAvgSalary());
+			ps = con.prepareStatement("LOAD DATA LOCAL INPATH ? INTO TABLE acaddwh.fact_spl_performance");
+			ps.setString(1, hadoopLocalFileName);
 
 			returnValue = ps.executeUpdate();
 

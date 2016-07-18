@@ -12,6 +12,6 @@ public interface ETLService<T> {
 
 	public int load(List<?> items, String absoluteLogFileName) throws LoadException;
 	
-	public int warehouse(List<?> items, String absoluteLogFileName) throws WarehouseException;
+	public void warehouse(String hadoopLocalFileName, String absoluteLogFileName) throws WarehouseException;
 
 }
