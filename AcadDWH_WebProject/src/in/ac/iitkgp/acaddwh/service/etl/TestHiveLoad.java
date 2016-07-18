@@ -33,7 +33,7 @@ public class TestHiveLoad {
 			for (Test test : (List<Test>) tests) {
 				try {
 					++processedLineCount;
-					testDAO.moveFile();
+					//testDAO.moveFile();
 					count += testDAO.saveDim(con, test);
 					System.out.println("[W] Warehoused Test " + test);
 				} catch (SQLException e) {

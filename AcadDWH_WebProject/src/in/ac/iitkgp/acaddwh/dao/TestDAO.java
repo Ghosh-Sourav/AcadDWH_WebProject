@@ -45,6 +45,7 @@ public class TestDAO {
 		PreparedStatement ps = null;
 
 		try {
+			String hadoopMachineLocalFilePath = "/home/mtech/15CS60R16/AcadDWH/20160718031631256_IITKGP_dim_departments-hive.csv";
 			String hdfsFilePath = "/user/15CS60R16/AcadDWH/test_table_data.csv";
 
 			// ps = con.prepareStatement("insert into table test_table select ?,
@@ -52,9 +53,9 @@ public class TestDAO {
 			// ps.setInt(1, test.getRoll());
 			// ps.setString(2, test.getName());
 
-			ps = con.prepareStatement("LOAD DATA INPATH ? INTO TABLE acaddwh.test_table");
+			ps = con.prepareStatement("LOAD DATA LOCAL INPATH ? INTO TABLE acaddwh.dim_departments");
 
-			ps.setString(1, hdfsFilePath);
+			ps.setString(1, hadoopMachineLocalFilePath);
 
 			System.out.println("Name = " + test.getName() + ", Roll = " + test.getRoll());
 
