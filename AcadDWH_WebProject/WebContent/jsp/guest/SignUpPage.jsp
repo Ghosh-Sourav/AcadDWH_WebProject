@@ -14,7 +14,6 @@
 					<td><input type="text" class="form-control"
 						id="key" name="key" placeholder="Enter preferred ID"
 						required="required"></td>
-					<td><i>(To be modified by system)</i></td>
 				</tr>
 				<tr>
 					<th>Institute Name:</th>

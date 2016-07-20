@@ -56,6 +56,8 @@ public class ETLDriver implements Runnable {
 		} catch (Exception e) {
 			e.printStackTrace();
 			System.out.println("ETLDriver thread aborted!");
+			request.setStatus(request.getStatus() + " Aborted!");
+			requestService.updateLog(request);
 		} finally {
 			// deleteFile();
 		}
