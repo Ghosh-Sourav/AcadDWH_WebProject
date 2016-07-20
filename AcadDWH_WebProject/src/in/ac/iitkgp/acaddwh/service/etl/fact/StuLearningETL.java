@@ -29,6 +29,7 @@ public class StuLearningETL implements ETLService<StuLearning> {
 
 		try {
 			br = new BufferedReader(new FileReader(filePath));
+			long lineNumber = 0;
 			while ((line = br.readLine()) != null) {
 				StuLearning stuLearning = new StuLearning();
 				String[] values = line.split(splitter);
@@ -44,7 +45,8 @@ public class StuLearningETL implements ETLService<StuLearning> {
 				stuLearning.setPrPsImpr(Float.parseFloat(values[8]));
 				stuLearning.setPercentAttended(Float.parseFloat(values[9]));
 
-				System.out.println("Extracted StuLearning " + stuLearning);
+				++lineNumber;
+				System.out.println("Extracted StuLearning " + lineNumber + stuLearning);
 
 				stuLearnings.add(stuLearning);
 			}

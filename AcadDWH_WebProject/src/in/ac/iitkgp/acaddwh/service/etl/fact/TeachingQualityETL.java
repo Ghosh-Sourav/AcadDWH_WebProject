@@ -29,6 +29,7 @@ public class TeachingQualityETL implements ETLService<TeachingQuality> {
 
 		try {
 			br = new BufferedReader(new FileReader(filePath));
+			long lineNumber = 0;
 			while ((line = br.readLine()) != null) {
 				TeachingQuality teachingQuality = new TeachingQuality();
 				String[] values = line.split(splitter);
@@ -40,7 +41,8 @@ public class TeachingQualityETL implements ETLService<TeachingQuality> {
 				teachingQuality.setNoOfEvaluation(Integer.parseInt(values[4]));
 				teachingQuality.setAvgTeachingQuality(Float.parseFloat(values[5]));
 
-				System.out.println("Extracted TeachingQuality " + teachingQuality);
+				++lineNumber;
+				System.out.println("Extracted TeachingQuality " + lineNumber + teachingQuality);
 
 				teachingQualitys.add(teachingQuality);
 			}
