@@ -7,6 +7,7 @@ import java.util.List;
 import javax.servlet.http.Part;
 
 import in.ac.iitkgp.acaddwh.bean.dim.Request;
+import in.ac.iitkgp.acaddwh.config.ProjectInfo;
 import in.ac.iitkgp.acaddwh.dso.ItemDSO;
 import in.ac.iitkgp.acaddwh.exception.ETLException;
 import in.ac.iitkgp.acaddwh.exception.ExtractException;
@@ -141,13 +142,21 @@ public class ETLDriver implements Runnable {
 			request.setStatus("Transformation completed, Loading...");
 			requestService.updateLog(request);
 
-			resultCount = etlService.load(items, absoluteFileNameWithoutExtn + "-report.txt");
-			System.out.println("Loaded " + resultCount + " items");
-			request.setStatus("Loading completed, Warehousing...");
-			requestService.updateLog(request);
+			if (ProjectInfo.isConstraintViolationReqd()) {
+				System.out.println("Constraint validation required; Loading into DB before warehousing...");
+				resultCount = etlService.load(items, absoluteFileNameWithoutExtn + "-report.txt");
+				System.out.println("Loaded " + resultCount + " items");
+				request.setStatus("Loading completed with constraint checking, Warehousing...");
+				requestService.updateLog(request);
+			} else {
+				System.out.println("Constraint validation not required; Skipping loading into DB phase...");
+				request.setStatus("Transformation completed, Warehousing...");
+				requestService.updateLog(request);
+			}
 
 			/*
-			 * Save warehoused output to "-hive.csv" file, and send to hadoop node
+			 * Save warehoused output to "-hive.csv" file, and send to hadoop
+			 * node
 			 */
 			ItemDSO.writeTransformedCSV(items, absoluteFileNameWithoutExtn + "-hive.csv");
 			String hadoopLocalFileName = SCP.sendToHadoopNode(absoluteFileNameWithoutExtn + "-hive.csv");
@@ -179,7 +188,7 @@ public class ETLDriver implements Runnable {
 
 		} catch (Exception e) {
 			System.out.println("Exeption occurred!");
-			request.setStatus(request.getStatus() + " Aborted due to: " + e.getMessage());
+			request.setStatus(request.getStatus() + " Aborted!");
 			requestService.updateLog(request);
 
 		}

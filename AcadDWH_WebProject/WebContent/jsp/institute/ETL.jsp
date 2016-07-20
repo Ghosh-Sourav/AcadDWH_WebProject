@@ -1,3 +1,4 @@
+<%@page import="in.ac.iitkgp.acaddwh.config.ProjectInfo"%>
 <%@page import="java.util.LinkedHashMap"%>
 <%@page import="java.util.Map"%>
 <jsp:include page="../commons/header.jsp" />
@@ -19,11 +20,34 @@
 	dfs.put("spl_performance", "fact");
 	dfs.put("stu_learning", "fact");
 	dfs.put("teaching_quality", "fact");
-	
 %>
 <h1>ETL Processes</h1>
 <hr />
-
+<blockquote>
+	<b>Constraint Validation:</b>
+	<%
+		if (ProjectInfo.isConstraintViolationReqd()) {
+	%><mark>ON</mark>
+	<br /> Duplicate data and inconsistent data will not be permitted.<br />
+	Erroneous files or files not conforming to corresponding header format
+	will be rejected.<br /> Dimensions are required to loaded before
+	dependent facts can be uploaded.<br /> <br />
+	<i>This setting implies slower loading but requires less caution
+		while uploading files.</i>
+	<%
+		} else {
+	%><mark>OFF</mark>
+	<br /> Duplicate data and inconsistent data will be permitted.<br />
+	Erroneous files or files not conforming to corresponding header format
+	will be rejected.<br /> Dimensions are not required to loaded before
+	dependent facts can be uploaded.<br /> <br />
+	<i>This setting allows faster loading but requires more caution
+		while uploading files.</i>
+	<%
+		}
+	%>
+</blockquote>
+<hr />
 <table class="table table-hover" style="text-align: center;">
 	<thead>
 		<tr>
@@ -43,7 +67,9 @@
 		<tr class="list-items">
 			<td><%=df.getKey().toString().toUpperCase()%></td>
 			<td><%="dim".equals(df.getValue()) ? "Dimension" : "Fact"%></td>
-			<td><a href="/acaddwh/csv/header_<%=df.getValue() %>_<%=df.getKey() %>.csv" target="_blank">Download Header</a></td>
+			<td><a
+				href="/acaddwh/csv/header_<%=df.getValue()%>_<%=df.getKey()%>.csv"
+				target="_blank">Download Header</a></td>
 			<td>
 				<form class="form-horizontal fileUploadForm" role="form"
 					action="/acaddwh/ETLController?df=<%=df.getValue() + "_" + df.getKey()%>"
