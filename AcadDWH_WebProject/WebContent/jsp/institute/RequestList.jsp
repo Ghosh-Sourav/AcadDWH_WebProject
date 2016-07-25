@@ -45,16 +45,16 @@
 			<td><%=etlRequest.getStatus() %></td>
 			<td>
 				<%
-					if (etlRequest.getStatus().equals("ETL Process completed successfully")) {
-						out.println("N/A");
-					} else if (etlRequest.getStatus().contains("failed")) {
+					if (etlRequest.getStatus().contains("failed")) {
 						%>
 						<a href="/acaddwh/DownloadController?filename=<%=etlRequest.getFileNameWithoutExtn()%>-report.txt" target="_blank">View error report</a>
 						<%
-					} else {
+					} else if (etlRequest.getStatus().contains("Aborted!")) {
 						%>
 						Contact service provider for further information
 						<%
+					} else {
+						out.println("N/A");
 					}
 				%>
 			</td>

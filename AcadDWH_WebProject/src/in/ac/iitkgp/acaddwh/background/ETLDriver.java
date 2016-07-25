@@ -2,6 +2,7 @@ package in.ac.iitkgp.acaddwh.background;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Collection;
 import java.util.List;
 
 import javax.servlet.http.Part;
@@ -26,15 +27,15 @@ public class ETLDriver implements Runnable {
 	private Request request = null;
 	private String df = null;
 	private String absoluteFileNameWithoutExtn = null;
-	private Part part = null;
+	private Collection<Part> parts = null;
 
 	RequestService requestService = null;
 
-	public ETLDriver(Request request, String df, String absoluteFileNameWithoutExtn, Part part) {
+	public ETLDriver(Request request, String df, String absoluteFileNameWithoutExtn, Collection<Part> parts) {
 		this.request = request;
 		this.df = df;
 		this.absoluteFileNameWithoutExtn = absoluteFileNameWithoutExtn;
-		this.part = part;
+		this.parts = parts;
 
 		requestService = new RequestServiceImpl();
 	}
@@ -65,7 +66,9 @@ public class ETLDriver implements Runnable {
 	}
 
 	private void uploadCsvFile() throws IOException {
-		part.write(absoluteFileNameWithoutExtn + ".csv");
+		for (Part part : parts) {
+			part.write(absoluteFileNameWithoutExtn + ".csv");
+		}
 	}
 
 	@SuppressWarnings("unused")

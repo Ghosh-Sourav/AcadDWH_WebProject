@@ -2,6 +2,7 @@ package in.ac.iitkgp.acaddwh.controller;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Collection;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.MultipartConfig;
@@ -66,7 +67,8 @@ public class ETLController extends HttpServlet {
 					fileSaveDir.mkdir();
 				}
 
-				Part part = request.getParts().iterator().next();
+				
+				Collection<Part> parts = request.getParts();
 
 				Request etlRequest = new Request();
 				etlRequest.setRequestKey(requestKey);
@@ -79,7 +81,7 @@ public class ETLController extends HttpServlet {
 					throw (new Exception());
 				}
 
-				Runnable runnable = new ETLDriver(etlRequest, df, absoluteFileNameWithoutExtn, part);
+				Runnable runnable = new ETLDriver(etlRequest, df, absoluteFileNameWithoutExtn, parts);
 				Thread etlDriverThread = new Thread(runnable);
 				etlDriverThread.start();
 
