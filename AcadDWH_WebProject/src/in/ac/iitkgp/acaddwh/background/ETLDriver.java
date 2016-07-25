@@ -154,11 +154,13 @@ public class ETLDriver implements Runnable {
 				System.out.println("Constraint validation required; Loading into DB before warehousing...");
 				resultCount = etlService.load(items, absoluteFileNameWithoutExtn + "-report.txt");
 				System.out.println("Loaded " + resultCount + " items");
-				request.setStatus("Loading completed with constraint checking, Warehousing...");
+				request.setStatus("Loading completed with constraint checking, Warehousing..." + "<br/> E: " + (timePostExtract - timeInitial)
+						+ "<br/> T: " + (timePostTransform - timePostExtract));
 				requestService.updateLog(request);
 			} else {
 				System.out.println("Constraint validation not required; Skipping loading into DB phase...");
-				request.setStatus("Transformation completed, Warehousing...");
+				request.setStatus("Transformation completed, Warehousing..." + "<br/> E: " + (timePostExtract - timeInitial)
+						+ "<br/> T: " + (timePostTransform - timePostExtract));
 				requestService.updateLog(request);
 			}
 
