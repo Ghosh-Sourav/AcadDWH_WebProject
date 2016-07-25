@@ -125,21 +125,26 @@ public class ETLDriver implements Runnable {
 	private void drive(Class<?> etlClass)
 			throws ClassNotFoundException, InstantiationException, IllegalAccessException {
 		int resultCount = 0;
+		long timeInitial, timePostExtract, timePostTransform, timePostWarehouse;
 
 		ETLService<?> etlService = (ETLService<?>) etlClass.newInstance();
 
 		try {
+			timeInitial = System.nanoTime();
+
 			List<?> items = etlService.extract(absoluteFileNameWithoutExtn + ".csv", ",",
 					absoluteFileNameWithoutExtn + "-report.txt");
-
+			timePostExtract = System.nanoTime();
 			System.out.println("Extracted " + items.size() + " items");
-			request.setStatus("Extraction completed, Transforming...");
+			request.setStatus("Extraction completed, Transforming..." + "<br/> E: " + (timePostExtract - timeInitial));
 			requestService.updateLog(request);
 
 			resultCount = etlService.transform(items, request.getInstituteKey(),
 					absoluteFileNameWithoutExtn + "-report.txt");
+			timePostTransform = System.nanoTime();
 			System.out.println("Transformed " + resultCount + " items");
-			request.setStatus("Transformation completed, Loading...");
+			request.setStatus("Transformation completed, Loading..." + "<br/> E: " + (timePostExtract - timeInitial)
+					+ "<br/> T: " + (timePostTransform - timePostExtract));
 			requestService.updateLog(request);
 
 			if (ProjectInfo.isConstraintViolationReqd()) {
@@ -162,8 +167,11 @@ public class ETLDriver implements Runnable {
 			String hadoopLocalFileName = SCP.sendToHadoopNode(absoluteFileNameWithoutExtn + "-hive.csv");
 
 			etlService.warehouse(hadoopLocalFileName, absoluteFileNameWithoutExtn + "-report.txt");
+			timePostWarehouse = System.nanoTime();
 			System.out.println("Warehoused " + hadoopLocalFileName);
-			request.setStatus("ETL Process completed successfully");
+			request.setStatus("ETL Process completed successfully" + "<br/> E: " + (timePostExtract - timeInitial)
+					+ "<br/> T: " + (timePostTransform - timePostExtract) + "<br/> L/W: "
+					+ (timePostWarehouse - timePostTransform) + "<br/> ETL/W: " + (timePostWarehouse - timeInitial));
 			requestService.updateLog(request);
 
 		} catch (ExtractException e) {

@@ -30,19 +30,19 @@
 	%><mark>ON</mark>
 	<br /> Duplicate data and inconsistent data will not be permitted.<br />
 	Erroneous files or files not conforming to corresponding header format
-	will be rejected.<br /> Dimensions are required to loaded before
-	dependent facts can be uploaded.<br /> <br />
-	<i>This setting implies slower loading but requires less caution
-		while uploading files.</i>
+	will be rejected.<br /> Dimensions are required to be loaded before
+	dependent facts can be uploaded.<br /> <br /> <i>This setting
+		implies slower loading but requires less caution while uploading
+		files.</i>
 	<%
 		} else {
 	%><mark>OFF</mark>
 	<br /> Duplicate data and inconsistent data will be permitted.<br />
 	Erroneous files or files not conforming to corresponding header format
-	will be rejected.<br /> Dimensions are not required to loaded before
-	dependent facts can be uploaded.<br /> <br />
-	<i>This setting allows faster loading but requires more caution
-		while uploading files.</i>
+	will be rejected.<br /> Dimensions are not required to be loaded
+	before dependent facts can be uploaded.<br /> <br /> <i>This
+		setting allows faster loading but requires more caution while
+		uploading files.</i>
 	<%
 		}
 	%>
