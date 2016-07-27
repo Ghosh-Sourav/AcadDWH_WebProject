@@ -24,6 +24,7 @@
 		<tr>
 			<th style="text-align: center;">Request ID</th>
 			<th style="text-align: center;">Uploaded CSV</th>
+			<th style="text-align: center;"></th>
 			<th style="text-align: center;">Status</th>
 			<th style="text-align: center;">
 				Error Report
@@ -42,6 +43,7 @@
 		<tr class="list-items">
 			<td><%=etlRequest.getRequestKey()%></td>
 			<td><a href="/acaddwh/DownloadController?filename=<%=etlRequest.getFileNameWithoutExtn()%>.csv" target="_blank">View CSV file</a></td>
+			<td><%=etlRequest.getFileNameWithoutExtn()%></td>
 			<td><%=etlRequest.getStatus() %></td>
 			<td>
 				<%

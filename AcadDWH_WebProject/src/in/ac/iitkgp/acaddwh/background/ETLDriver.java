@@ -2,6 +2,7 @@ package in.ac.iitkgp.acaddwh.background;
 
 import java.io.File;
 import java.io.IOException;
+import java.lang.management.ManagementFactory;
 import java.util.Collection;
 import java.util.List;
 
@@ -133,18 +134,21 @@ public class ETLDriver implements Runnable {
 		ETLService<?> etlService = (ETLService<?>) etlClass.newInstance();
 
 		try {
-			timeInitial = System.nanoTime();
+			timeInitial = ManagementFactory.getThreadMXBean().getThreadCpuTime(Thread.currentThread().getId())
+					/ 1000000;
 
 			List<?> items = etlService.extract(absoluteFileNameWithoutExtn + ".csv", ",",
 					absoluteFileNameWithoutExtn + "-report.txt");
-			timePostExtract = System.nanoTime();
+			timePostExtract = ManagementFactory.getThreadMXBean().getThreadCpuTime(Thread.currentThread().getId())
+					/ 1000000;
 			System.out.println("Extracted " + items.size() + " items");
 			request.setStatus("Extraction completed, Transforming..." + "<br/> E: " + (timePostExtract - timeInitial));
 			requestService.updateLog(request);
 
 			resultCount = etlService.transform(items, request.getInstituteKey(),
 					absoluteFileNameWithoutExtn + "-report.txt");
-			timePostTransform = System.nanoTime();
+			timePostTransform = ManagementFactory.getThreadMXBean().getThreadCpuTime(Thread.currentThread().getId())
+					/ 1000000;
 			System.out.println("Transformed " + resultCount + " items");
 			request.setStatus("Transformation completed, Loading..." + "<br/> E: " + (timePostExtract - timeInitial)
 					+ "<br/> T: " + (timePostTransform - timePostExtract));
@@ -154,13 +158,13 @@ public class ETLDriver implements Runnable {
 				System.out.println("Constraint validation required; Loading into DB before warehousing...");
 				resultCount = etlService.load(items, absoluteFileNameWithoutExtn + "-report.txt");
 				System.out.println("Loaded " + resultCount + " items");
-				request.setStatus("Loading completed with constraint checking, Warehousing..." + "<br/> E: " + (timePostExtract - timeInitial)
-						+ "<br/> T: " + (timePostTransform - timePostExtract));
+				request.setStatus("Loading completed with constraint checking, Warehousing..." + "<br/> E: "
+						+ (timePostExtract - timeInitial) + "<br/> T: " + (timePostTransform - timePostExtract));
 				requestService.updateLog(request);
 			} else {
 				System.out.println("Constraint validation not required; Skipping loading into DB phase...");
-				request.setStatus("Transformation completed, Warehousing..." + "<br/> E: " + (timePostExtract - timeInitial)
-						+ "<br/> T: " + (timePostTransform - timePostExtract));
+				request.setStatus("Transformation completed, Warehousing..." + "<br/> E: "
+						+ (timePostExtract - timeInitial) + "<br/> T: " + (timePostTransform - timePostExtract));
 				requestService.updateLog(request);
 			}
 
@@ -172,7 +176,8 @@ public class ETLDriver implements Runnable {
 			String hadoopLocalFileName = SCP.sendToHadoopNode(absoluteFileNameWithoutExtn + "-hive.csv");
 
 			etlService.warehouse(hadoopLocalFileName, absoluteFileNameWithoutExtn + "-report.txt");
-			timePostWarehouse = System.nanoTime();
+			timePostWarehouse = ManagementFactory.getThreadMXBean().getThreadCpuTime(Thread.currentThread().getId())
+					/ 1000000;
 			System.out.println("Warehoused " + hadoopLocalFileName);
 			request.setStatus("ETL Process completed successfully" + "<br/> E: " + (timePostExtract - timeInitial)
 					+ "<br/> T: " + (timePostTransform - timePostExtract) + "<br/> L/W: "

@@ -26,8 +26,11 @@ import in.ac.iitkgp.acaddwh.util.KeyRepository;
  * Servlet implementation class ETLController
  */
 @WebServlet(asyncSupported = true, urlPatterns = { "/ETLController" })
-@MultipartConfig(location = "/home/mt1/15CS60R16/AcadDWH/tempUpload/", fileSizeThreshold = 1024 * 1024 * 256, maxFileSize = 1024 * 1024 * 1024, maxRequestSize = 1024 * 1024
-		* 1024 * 50) /* Sizes in B */
+@MultipartConfig(location = "/home/mt1/15CS60R16/AcadDWH/tempUpload", fileSizeThreshold = 2100000000, maxFileSize = 2100000000, maxRequestSize = 2100000000) /*
+																																								 * Sizes
+																																								 * in
+																																								 * B
+																																								 */
 public class ETLController extends HttpServlet {
 	private static final long serialVersionUID = 1L;
 
@@ -67,7 +70,6 @@ public class ETLController extends HttpServlet {
 					fileSaveDir.mkdir();
 				}
 
-				
 				Collection<Part> parts = request.getParts();
 
 				Request etlRequest = new Request();
