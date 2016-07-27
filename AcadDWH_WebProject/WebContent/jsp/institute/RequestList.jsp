@@ -1,3 +1,4 @@
+<%@page import="in.ac.iitkgp.acaddwh.util.FileStats"%>
 <%@page import="in.ac.iitkgp.acaddwh.bean.dim.Request"%>
 <%@page import="java.util.List"%>
 <%@page import="in.ac.iitkgp.acaddwh.bean.dim.Institute"%>
@@ -43,7 +44,11 @@
 		<tr class="list-items">
 			<td><%=etlRequest.getRequestKey()%></td>
 			<td><a href="/acaddwh/DownloadController?filename=<%=etlRequest.getFileNameWithoutExtn()%>.csv" target="_blank">View CSV file</a></td>
-			<td><%=etlRequest.getFileNameWithoutExtn()%></td>
+			<td>
+				<%=etlRequest.getFileNameWithoutExtn().substring(etlRequest.getFileNameWithoutExtn().indexOf("_")+1)%><br/>
+				Rows: <%=FileStats.getLineCount(etlRequest.getFileNameWithoutExtn()+".csv") %><br/>
+				Size (in B): <%=FileStats.getSizeInBytes(etlRequest.getFileNameWithoutExtn()+".csv") %>
+			</td>
 			<td><%=etlRequest.getStatus() %></td>
 			<td>
 				<%
