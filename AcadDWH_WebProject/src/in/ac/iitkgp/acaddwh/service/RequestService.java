@@ -11,4 +11,6 @@ public interface RequestService {
 	public int updateLog(Request request);
 	
 	public List<Request> getLogs(Institute institute);
+	
+	public List<Request> getLogs();
 }

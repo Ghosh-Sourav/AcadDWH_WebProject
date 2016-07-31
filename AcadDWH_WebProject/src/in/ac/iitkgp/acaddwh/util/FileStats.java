@@ -9,11 +9,12 @@ import java.io.InputStream;
 import in.ac.iitkgp.acaddwh.config.ProjectInfo;
 
 public class FileStats {
-	public static long getLineCount(String fileName) throws IOException {
+	public static long getLineCount(String fileName) {
 		String absoluteFileName = ProjectInfo.getUploadDirPath() + fileName;
 
-		InputStream is = new BufferedInputStream(new FileInputStream(absoluteFileName));
+		InputStream is = null;
 		try {
+			is = new BufferedInputStream(new FileInputStream(absoluteFileName));
 			byte[] c = new byte[1024];
 			long count = 0;
 			int readChars = 0;
@@ -32,13 +33,24 @@ public class FileStats {
 		} catch (Exception e) {
 			return -1;
 		} finally {
-			is.close();
+			if (is != null) {
+				try {
+					is.close();
+				} catch (IOException e) {
+				}
+			}
 		}
 	}
 
 	public static long getSizeInBytes(String fileName) {
 		String absoluteFileName = ProjectInfo.getUploadDirPath() + fileName;
-		return (new File(absoluteFileName).length());
+		long size;
+		try {
+			size = (new File(absoluteFileName).length());
+		} catch (Exception e) {
+			size = -1;
+		}
+		return size;
 	}
 
 }

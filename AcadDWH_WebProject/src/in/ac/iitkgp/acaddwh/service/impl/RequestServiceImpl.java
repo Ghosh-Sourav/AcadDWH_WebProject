@@ -65,5 +65,23 @@ public class RequestServiceImpl implements RequestService {
 
 		return requests;
 	}
+	
+	@Override
+	public List<Request> getLogs() {
+		List<Request> requests = new ArrayList<Request>();
+
+		Connection con = DBConnection.getReadConnection();
+		RequestDAO requestDAO = new RequestDAO();
+
+		try {
+			requests = requestDAO.getLogs(con);
+		} catch (Exception e) {
+			System.out.println(e.getMessage());
+		} finally {
+			DBConnection.closeConnection(con);
+		}
+
+		return requests;
+	}
 
 }

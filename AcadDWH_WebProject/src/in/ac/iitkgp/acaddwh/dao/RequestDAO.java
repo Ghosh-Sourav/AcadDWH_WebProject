@@ -85,6 +85,39 @@ public class RequestDAO {
 		
 	}
 	
+	public List<Request> getLogs(Connection con) throws SQLException {
+		List<Request> requests = new ArrayList<Request>();
+		ResultSet rs = null;
+		PreparedStatement ps = null;
+
+		try {
+			ps = con.prepareStatement(
+					"select request_key, institute_key, file_name_without_extn, status from acaddwh.log_requests order by request_key desc");
+
+			rs = ps.executeQuery();
+			while (rs.next()) {
+				Request request = new Request();
+				request.setRequestKey(rs.getString("request_key"));
+				request.setInstituteKey(rs.getString("institute_key"));
+				request.setFileNameWithoutExtn(rs.getString("file_name_without_extn"));
+				request.setStatus(rs.getString("status"));
+				
+				requests.add(request);
+			}
+
+		} finally {
+			if (rs != null) {
+				rs.close();
+			}
+			if (ps != null) {
+				ps.close();
+			}
+		}
+		
+		return requests;
+		
+	}
+	
 	
 
 }
