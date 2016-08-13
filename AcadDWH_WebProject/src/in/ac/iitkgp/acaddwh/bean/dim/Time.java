@@ -44,7 +44,7 @@ public class Time extends Item {
 	@Override
 	public String getPrintableLine() {
 		String line;
-		line = timeKey + "," + timeCode + "," + acadsemester + "," + acadsession + ",";
+		line = timeKey + "," + timeCode + "," + acadsemester + "," + acadsession + "\n";
 		return line;
 	}
 
